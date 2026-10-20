@@ -14,7 +14,6 @@ declare module 'vue' {
     CountdownTimer: typeof import('./src/components/CountdownTimer.vue')['default']
     DressCodeSection: typeof import('./src/components/DressCodeSection.vue')['default']
     GalleryCarousel: typeof import('./src/components/GalleryCarousel.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     InvitationAudio: typeof import('./src/components/InvitationAudio.vue')['default']
     InvitationCelebration: typeof import('./src/components/InvitationCelebration.vue')['default']
     InvitationDetails: typeof import('./src/components/InvitationDetails.vue')['default']

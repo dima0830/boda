@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import froggsImage from "@/assets/images/sapo1.png";
+import frogsImage from "@/assets/images/sapo1.png";
 import butterflyImage from "@/assets/images/mariposa-.png";
 import stampImage from "@/assets/images/sello-2.png";
 import crocodileImage from "@/assets/images/cocodrilo.png";

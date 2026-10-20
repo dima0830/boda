@@ -176,15 +176,17 @@ async function confirmAttendance() {
   isSubmitting.value = true;
 
   try {
-    await $fetch("/api/rsvp", {
+    const response = await fetch("/api/rsvp", {
       method: "POST",
-      body: {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         fullName: guestName.value.trim(),
         phone: guestPhone.value.trim(),
         attendance: attendance.value,
         passesCount: passesCount.value,
-      },
+      }),
     });
+    if (!response.ok) throw new Error("No se pudo guardar la confirmación.");
     submittedName.value = guestName.value.trim();
     submittedPasses.value = passesCount.value;
     submitted.value = true;

@@ -73,16 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-
-definePageMeta({
-  layout: "default",
-});
-
-useHead({
-  title: "Invitados",
-  meta: [{ name: "robots", content: "noindex, nofollow" }],
-});
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
 interface Rsvp {
   id: number;
@@ -120,15 +111,17 @@ async function fetchList() {
   loading.value = true;
   listError.value = "";
   try {
-    const res = await $fetch<{ ok: true; rows: Rsvp[] }>("/api/invitados/list");
+    const response = await fetch("/api/invitados/list");
+    if (response.status === 401) {
+      authenticated.value = false;
+      return;
+    }
+    if (!response.ok) throw new Error("No se pudo cargar la lista.");
+    const res = (await response.json()) as { ok: true; rows: Rsvp[] };
     rows.value = res.rows;
     authenticated.value = true;
-  } catch (error: any) {
-    if (error?.statusCode === 401) {
-      authenticated.value = false;
-    } else {
-      listError.value = "No se pudo cargar la lista.";
-    }
+  } catch {
+    listError.value = "No se pudo cargar la lista.";
   } finally {
     loading.value = false;
   }
@@ -139,26 +132,53 @@ async function login() {
   loading.value = true;
   loginError.value = "";
   try {
-    await $fetch("/api/invitados/login", {
+    const response = await fetch("/api/invitados/login", {
       method: "POST",
-      body: { password: password.value },
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: password.value }),
     });
+    if (response.status === 401) {
+      loginError.value = "Contraseña incorrecta.";
+      return;
+    }
+    if (!response.ok) throw new Error("No se pudo iniciar sesión.");
     password.value = "";
     await fetchList();
-  } catch (error: any) {
-    loginError.value = error?.statusCode === 401 ? "Contraseña incorrecta." : "Ocurrió un error.";
+  } catch {
+    loginError.value = "Ocurrió un error.";
   } finally {
     loading.value = false;
   }
 }
 
 async function logout() {
-  await $fetch("/api/invitados/logout", { method: "POST" }).catch(() => {});
+  await fetch("/api/invitados/logout", { method: "POST" }).catch(() => {});
   authenticated.value = false;
   rows.value = [];
 }
 
-onMounted(fetchList);
+const originalTitle = document.title;
+const existingRobotsMeta =
+  document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+const robotsMeta = existingRobotsMeta ?? document.createElement("meta");
+const originalRobotsContent = robotsMeta.content;
+
+onMounted(() => {
+  document.title = "Invitados";
+  robotsMeta.name = "robots";
+  robotsMeta.content = "noindex, nofollow";
+  if (!existingRobotsMeta) document.head.append(robotsMeta);
+  void fetchList();
+});
+
+onBeforeUnmount(() => {
+  document.title = originalTitle;
+  if (existingRobotsMeta) {
+    robotsMeta.content = originalRobotsContent;
+  } else {
+    robotsMeta.remove();
+  }
+});
 </script>
 
 <style scoped>
