@@ -24,7 +24,7 @@
         <GalleryCarousel :images="galleryImages" />
       </div>
 
-      <p class="texto-descripcion">
+      <p class="texto-descripcion mt-8 fade-in-element delay-1">
         Cada foto cuenta la historia de una pequeña flor de Bayou que con amor y
         sueños se transformó en la joven que soy hoy.
       </p>

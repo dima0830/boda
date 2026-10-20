@@ -39,18 +39,18 @@
     </div>
 
     <!-- COUNTDOWN EVENTO -->
-    <div class="evento-box fade-in-element delay-2">
+    <div class="evento-box fade-in-element delay-2 border border-gray-400">
       <p class="subtitulo-festejar2">FALTAN</p>
-      <CountdownTimer :event-date="eventDate" />
+      <CountdownTimer event-date="2027-04-23T18:00:00-05:00"/>
     </div>
 
     <!-- FECHA PRINCIPAL CON BRILLO -->
     <div class="fecha-principal fade-in-element delay-3">
-      <h2 class="mes-title">Septiembre</h2>
+      <h2 class="mes-title">Abril</h2>
       <div class="fecha-filadecorada">
-        <span class="dia-texto">SÁBADO</span>
-        <span class="numero-dia pulse-glow">26</span>
-        <span class="anio-texto">2026</span>
+        <span class="dia-texto">VIERNES</span>
+        <span class="numero-dia pulse-glow">23</span>
+        <span class="anio-texto">2027</span>
       </div>
       <h2 class="hora-title">7:00 p. m.</h2>
     </div>
@@ -65,15 +65,15 @@
 
         <div class="grid-dias numeros">
           <span class="empty"></span>
-          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-          <span>6</span><span>7</span><span>8</span><span>9</span>
-          <span>10</span><span>11</span><span>12</span><span>13</span>
-          <span>14</span><span>15</span><span>16</span><span>17</span>
-          <span>18</span><span>19</span><span>20</span><span>21</span>
-          <span>22</span><span>23</span><span>24</span><span>25</span>
+          <span></span><span></span><span>1</span><span>2</span><span>3</span>
+          <span>4</span><span>5</span><span>6</span><span>7</span>
+          <span>8</span><span>9</span><span>10</span><span>11</span>
+          <span>12</span><span>13</span><span>14</span><span>15</span>
+          <span>16</span><span>17</span><span>18</span><span>19</span>
+          <span>20</span><span>21</span><span>22</span>
 
           <span class="dia-destacado">
-            26
+            23
             <svg
               class="corazon-svg heartbeat"
               viewBox="0 0 24 24"
@@ -86,7 +86,7 @@
               />
             </svg>
           </span>
-
+          <span>24</span><span>25</span><span>26</span>
           <span>27</span>
           <span>28</span><span>29</span><span>30</span>
         </div>

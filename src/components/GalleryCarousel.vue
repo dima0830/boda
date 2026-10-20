@@ -27,20 +27,24 @@
       <div class="gallery-frame">
         <img :src="images[current].src" :alt="images[current].alt" />
       </div>
-    </div>
 
-    <!-- CONTROLES (SÓLO PUNTOS) -->
-    <div class="gallery-controls">
-      <div class="gallery-dots">
-        <button
-          v-for="(image, index) in images"
-          :key="image.src"
-          type="button"
-          :class="{ active: index === current }"
-          :aria-label="`Ver foto ${index + 1}`"
-          @click="current = index"
-        />
-      </div>
+      <!-- FLECHAS LATERALES -->
+      <button 
+        type="button" 
+        class="gallery-arrow gallery-prev" 
+        aria-label="Imagen anterior"
+        @click="prev"
+      >
+        &#10094;
+      </button>
+      <button 
+        type="button" 
+        class="gallery-arrow gallery-next" 
+        aria-label="Imagen siguiente"
+        @click="next"
+      >
+        &#10095;
+      </button>
     </div>
   </div>
 </template>
@@ -66,13 +70,17 @@ function next() {
   current.value = current.value === total.value - 1 ? 0 : current.value + 1;
 }
 
+function prev() {
+  current.value = current.value === 0 ? total.value - 1 : current.value - 1;
+}
+
 // Auto-advance
 let autoplayInterval: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
   autoplayInterval = setInterval(() => {
     next();
-  }, 5000);
+  }, 15000);
 });
 
 onBeforeUnmount(() => {
@@ -170,36 +178,38 @@ onBeforeUnmount(() => {
   }
 }
 
-/* PUNTOS DE NAVEGACIÓN CENTRADOS */
-.gallery-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.gallery-dots {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  row-gap: 0.5rem;
-  column-gap: 0.5rem;
-  max-width: 260px;
-}
-
-.gallery-dots button {
-  width: 0.55rem;
-  height: 0.55rem;
-  padding: 0;
-  border: 0;
+/* ESTILOS DE LAS FLECHAS LATERALES */
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #b59848;
+  border: none;
   border-radius: 50%;
-  background: rgba(181, 152, 72, 0.35);
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
   cursor: pointer;
+  z-index: 4;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
 }
 
-.gallery-dots button.active {
-  background: #b59848;
-  transform: scale(1.5);
+.gallery-arrow:hover {
+  background-color: #ffffff;
+  color: #8c7233;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-prev {
+  left: -17px;
+}
+
+.gallery-next {
+  right: -17px;
 }
 </style>

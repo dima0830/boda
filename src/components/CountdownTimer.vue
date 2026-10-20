@@ -27,43 +27,57 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 interface Props {
   eventDate?: string;
 }
 
+// FECHA CONFIGURADA: 22 de Abril de 2027 a las 06:00 PM (hora Colombia / UTC-5)
 const props = withDefaults(defineProps<Props>(), {
-  eventDate: "2026-09-26T18:00:00-05:00",
+  eventDate: "2027-04-23T18:00:00-05:00",
 });
 
-const dias = ref(0);
-const horas = ref(0);
-const minutos = ref(0);
-const segundos = ref(0);
+const dias = ref<string | number>(0);
+const horas = ref<string | number>("00");
+const minutos = ref<string | number>("00");
+const segundos = ref<string | number>("00");
 const eventHasPassed = ref(false);
 
 let interval: ReturnType<typeof setInterval> | null = null;
 
+// Función para rellenar con un cero a la izquierda si es menor a 10
+const padZero = (num: number) => String(num).padStart(2, "0");
+
 function calcularTiempo() {
-  const distance = new Date(props.eventDate).getTime() - Date.now();
+  const targetDate = new Date(props.eventDate).getTime();
+  
+  if (isNaN(targetDate)) {
+    console.error("Formato de fecha inválido en eventDate:", props.eventDate);
+    return;
+  }
+
+  const distance = targetDate - Date.now();
   eventHasPassed.value = distance <= 0;
 
   if (distance <= 0) {
     dias.value = 0;
-    horas.value = 0;
-    minutos.value = 0;
-    segundos.value = 0;
+    horas.value = "00";
+    minutos.value = "00";
+    segundos.value = "00";
     return;
   }
 
   dias.value = Math.floor(distance / (1000 * 60 * 60 * 24));
-  horas.value = Math.floor(
-    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-  );
-  minutos.value = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  segundos.value = Math.floor((distance % (1000 * 60)) / 1000);
+  horas.value = padZero(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+  minutos.value = padZero(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
+  segundos.value = padZero(Math.floor((distance % (1000 * 60)) / 1000));
 }
+
+// Reactiva el contador si cambias la propiedad externamente
+watch(() => props.eventDate, () => {
+  calcularTiempo();
+});
 
 onMounted(() => {
   calcularTiempo();
@@ -85,6 +99,7 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
+  justify-content: center;
   justify-items: center;
   max-width: min(100%, 320px);
   margin: 0 auto;
@@ -116,9 +131,17 @@ onBeforeUnmount(() => {
   color: #20534a;
   font-family: "Open Sans", sans-serif;
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.5px;
+}
+
+.countdown-complete {
+  grid-column: span 4;
+  font-family: "Cormorant", serif;
+  font-size: 1.5rem;
+  color: #20534a;
+  text-align: center;
 }
 
 @media (max-width: 480px) {
@@ -127,7 +150,7 @@ onBeforeUnmount(() => {
   }
 
   .time-value {
-    font-size: clamp(2.1rem, 9vw, 3rem);
+    font-size: clamp(1.1rem, 8vw, 2rem);
   }
 
   .time-label {
