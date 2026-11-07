@@ -144,6 +144,13 @@ onBeforeUnmount(() => {
   text-align: center;
 }
 
+/* Desde tablet la sección es una tarjeta de 390px: evita que los números toquen los bordes */
+@media (min-width: 600px) {
+  .time-value {
+    font-size: 3.25rem;
+  }
+}
+
 @media (max-width: 480px) {
   .timer-grid {
     gap: 0.75rem;

@@ -39,7 +39,7 @@
     </div>
 
     <!-- COUNTDOWN EVENTO -->
-    <div class="evento-box fade-in-element delay-2 border border-gray-400">
+    <div class="evento-box fade-in-element delay-2">
       <p class="subtitulo-festejar2">FALTAN</p>
       <CountdownTimer event-date="2027-04-23T18:00:00-05:00"/>
     </div>
@@ -137,7 +137,7 @@ onBeforeUnmount(() => {
 .invitacion-seccion {
   position: relative;
   width: 100%;
-  max-width: 390px;
+  max-width: none;
   margin: 0 auto;
   padding: 50px 15px;
   box-sizing: border-box;
@@ -401,9 +401,9 @@ onBeforeUnmount(() => {
 .rana-img {
   position: absolute;
   bottom: -22px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 110px;
+  /* Bajo las columnas SAB/DOM vacías para no tapar los días 29 y 30 */
+  right: 4px;
+  width: 90px;
   height: auto;
   z-index: 5;
   pointer-events: none;
@@ -513,6 +513,13 @@ onBeforeUnmount(() => {
 }
 
 /* ADAPTACIÓN MÓVIL */
+/* En móvil ocupa todo el ancho; desde tablet se muestra como tarjeta */
+@media (min-width: 600px) {
+  .invitacion-seccion {
+    max-width: 390px;
+  }
+}
+
 @media (max-width: 480px) {
   .mes-title {
     font-size: 2.8rem;

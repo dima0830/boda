@@ -205,7 +205,7 @@ async function confirmAttendance() {
 .confirm-section {
   position: relative;
   width: 100%;
-  max-width: 390px;
+  max-width: none;
   margin: 0 auto;
   padding: 30px 20px 40px;
   box-sizing: border-box;
@@ -534,5 +534,12 @@ async function confirmAttendance() {
   height: auto;
   display: block;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+/* En móvil ocupa todo el ancho; desde tablet se muestra como tarjeta */
+@media (min-width: 600px) {
+  .confirm-section {
+    max-width: 390px;
+  }
 }
 </style>

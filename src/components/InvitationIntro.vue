@@ -101,6 +101,8 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* Evita scroll horizontal mientras el texto entra desde la derecha */
+  overflow-x: clip;
 }
 
 /* MARCO CENTRAL */
@@ -128,6 +130,8 @@ onBeforeUnmount(() => {
   align-items: flex-end;
   gap: 4%;
   min-height: 200px;
+  /* Deja sitio a las mariposas inferiores para que no tapen el texto */
+  padding-bottom: 45px;
   z-index: 3;
 }
 
