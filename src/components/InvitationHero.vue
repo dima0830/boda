@@ -1,292 +1,288 @@
 <template>
   <section id="inicio" class="hero-section">
-    <!-- PANTALLA DE INICIO CON FONDO, TÍTULO, SOBRE VERDE, FECHA Y SELLO INTERACTIVO -->
-    <div v-if="!iniciado" class="pantalla-inicio" @click="iniciarExperiencia">
-      <img
-        src="@/assets/images/principal.png"
-        alt="Fondo Principal"
-        class="fondo-inicio"
-      />
+    <!-- degradado oscuro para leer los textos sobre el video de fondo -->
+    <div class="velo" aria-hidden="true"></div>
 
-      <!-- CONTENEDOR PRINCIPAL VERTICAL -->
-      <div class="hero-contenido">
-        <!-- TÍTULO ARRIBA DEL SOBRE -->
-        <img
-          src="@/assets/images/nombre-vale.png"
-          alt="Los Quince Años de Vale"
-          class="titulo-vale"
-        />
-
-        <!-- CONTENEDOR DEL SOBRE -->
-        <div class="sobre-wrapper">
-          <!-- SOBRE VERDE CON RELIEVES -->
-          <img
-            src="@/assets/images/sobre1.png"
-            alt="Sobre verde de invitación"
-            class="hero-sobre-base"
-          />
-
-          <!-- SELLO INTERACTIVO CENTRADO -->
-          <div class="sello-container">
-            <img
-              src="@/assets/images/sello.png"
-              alt="Sello de cera V"
-              class="sello-interactivo"
-            />
-          </div>
-        </div>
-
-        <!-- INSTRUCCIÓN DE APERTURA -->
-        <p class="instruccion-abrir">TOCA PARA ABRIR EL SOBRE</p>
-
-        <!-- FECHA ABAJO DEL SOBRE -->
-        <img
-          src="@/assets/images/date.png"
-          alt="26 | 09 | 26"
-          class="fecha-evento"
-        />
-      </div>
+    <!-- pétalos que caen sobre el video -->
+    <div class="petalos" aria-hidden="true">
+      <span v-for="p in petalos" :key="p.id" class="petalo" :style="p.estilo"></span>
     </div>
 
-    <!-- REPRODUCTOR DE VIDEO Y FLECHA DE DESPLAZAMIENTO -->
-    <template v-else>
-      <video
-        ref="videoRef"
-        autoplay
-        playsinline
-        class="hero-video"
-        @ended="videoFinalizado = true"
-      >
-        <source src="@/assets/videos/videoH.mp4" type="video/mp4" />
-        Tu navegador no soporta el formato de video.
-      </video>
+    <!-- rosas colgando desde el borde superior -->
+    <GuirnaldaFlores tipo="arriba" />
 
-      <!-- INDICADOR DESLIZA ABAJO -->
-      <div v-if="videoFinalizado" class="indicador-scroll">
-        <p class="texto-desliza">DESLIZA ABAJO</p>
-        <div class="flecha-saltarina">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 5v14M19 12l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-    </template>
+    <div class="hero-contenido">
+      <p class="antetitulo">NOS CASAMOS</p>
+
+      <h1 class="nombres">
+        <span class="nombre">Andrea</span>
+        <span class="amp">&amp;</span>
+        <span class="nombre">Juan Carlos</span>
+      </h1>
+      <span class="filete" aria-hidden="true"></span>
+      <p class="dia-boda">¡Nuestra Boda!</p>
+      <p class="fecha">Te elijo hoy y por el resto de mi vida</p>
+    </div>
+
+
+    <a href="#fecha" class="indicador-scroll" aria-label="Desliza hacia abajo">
+      <span class="texto-desliza">DESLIZA ABAJO</span>
+      <svg
+        class="flecha-saltarina"
+        xmlns="http://www.w3.org/2000/svg"
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M19 12l-7 7-7-7" />
+      </svg>
+    </a>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from "vue";
-
-const iniciado = ref(false);
-const videoFinalizado = ref(false);
-const videoRef = ref<HTMLVideoElement | null>(null);
-
-async function iniciarExperiencia() {
-  iniciado.value = true;
-  videoFinalizado.value = false;
-
-  await nextTick();
-
-  if (videoRef.value) {
-    videoRef.value.muted = false;
-    videoRef.value.play().catch((error) => {
-      console.error("Error al reproducir el video:", error);
-    });
-  }
-}
+/* Pétalos con tamaño, posición y ritmo al azar */
+const petalos = Array.from({ length: 14 }, (_, id) => ({
+  id,
+  estilo: {
+    left: `${Math.random() * 100}%`,
+    width: `${8 + Math.random() * 8}px`,
+    animationDuration: `${9 + Math.random() * 8}s`,
+    animationDelay: `${-Math.random() * 15}s`,
+    "--deriva": `${Math.random() * 120 - 60}px`,
+    "--giro": `${Math.random() * 540 - 270}deg`,
+    opacity: 0.55 + Math.random() * 0.4,
+  },
+}));
 </script>
 
 <style scoped>
 .hero-section {
+  --oro: #ead5a6; /* dorado claro: se lee sobre el video */
+  --oro-oscuro: #f5ead2;
+  --tinta: #4d4b43;
+
   position: relative;
-  width: 100%; /* Cambiado de 100vw a 100% para evitar desbordamientos por la barra de scroll */
+  width: 100%;
   height: 100vh;
-  height: 100dvh;
+  height: 100svh;
+  min-height: 600px;
+  max-height: 900px;
   overflow: hidden;
-  margin: 0;
-  padding: 0;
-  background-color: #000000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* transparente: detrás se ve el video de fondo de la invitación */
+  background: transparent;
 }
 
-/* PANTALLA DE INICIO */
-.pantalla-inicio {
+/* Degradado: oscurece arriba y en el centro para leer los textos blancos */
+.velo {
   position: absolute;
   inset: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  padding: 1.5rem 1rem;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 55%, rgba(20, 16, 10, 0.35), rgba(20, 16, 10, 0) 70%),
+    linear-gradient(180deg, rgba(20, 16, 10, 0.45) 0%, rgba(20, 16, 10, 0.1) 40%, rgba(20, 16, 10, 0.3) 100%);
 }
 
-.fondo-inicio {
+/* PÉTALOS */
+.petalos {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center; /* Asegura el centrado exacto de la imagen */
+  inset: 0;
   z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-/* CONTENEDOR VERTICAL APILADO */
+.petalo {
+  position: absolute;
+  top: -20px;
+  aspect-ratio: 1 / 1.3;
+  border-radius: 80% 0 80% 0;
+  background: radial-gradient(circle at 30% 30%, #fffdf8, #efe4d2 70%, #e0cfb4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  animation: caerPetalo linear infinite;
+}
+
+@keyframes caerPetalo {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(var(--deriva), 105vh) rotate(var(--giro));
+  }
+}
+
 .hero-contenido {
   position: relative;
   z-index: 2;
+  width: 100%;
+  max-width: 760px;
+  /* deja sitio arriba para las rosas y abajo para el divisor y el indicador */
+  padding: 110px 16px 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto; /* Centrado horizontal estricto */
-  gap: 1.25rem;
-}
-
-/* TÍTULO ARRIBA */
-.titulo-vale {
-  width: 85%;
-  max-width: 280px;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
-}
-
-/* CONTENEDOR DEL SOBRE */
-.sobre-wrapper {
-  position: relative;
-  width: 90%;
-  max-width: 320px;
-  display: flex; /* Cambiado a flex para facilitar el centrado */
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.3s ease;
-}
-
-.pantalla-inicio:hover .sobre-wrapper {
-  transform: scale(1.03);
-}
-
-.hero-sobre-base {
-  width: 100%;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.65));
-}
-
-/* SELLO Y POSICIONAMIENTO */
-.sello-container {
-  position: absolute;
-  top: 46%; /* Ligero ajuste para alinearlo con la solapa del sobre */
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 18%;
-  max-width: 60px;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.sello-interactivo {
-  width: 100%;
-  height: auto;
-  display: block;
-  animation: latidoZoomSello 2.2s ease-in-out infinite;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-}
-
-/* INSTRUCCIÓN */
-.instruccion-abrir {
   text-align: center;
-  color: #ffffff;
-  font-size: 0.8rem;
+}
+
+.antetitulo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 18px;
+  font-family: "Cinzel", "Cormorant Garamond", serif;
+  font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+  font-weight: 600;
+  letter-spacing: 6px;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+  animation: aparecer 1s ease 0.2s both;
+}
+
+/* líneas doradas a los lados */
+.antetitulo::before,
+.antetitulo::after {
+  content: "";
+  width: clamp(24px, 6vw, 56px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--oro-oscuro));
+}
+.antetitulo::after {
+  background: linear-gradient(90deg, var(--oro-oscuro), transparent);
+}
+
+/* TEXTOS */
+.nombres {
+  margin: 12px 0 0;
+  font-family: "Great Vibes", cursive;
+  font-weight: 400;
+  font-size: clamp(3.6rem, 17vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* cada nombre se descubre de izquierda a derecha, como escrito a mano */
+.nombre {
+  display: block;
+  padding: 0 0.2em;
+  white-space: nowrap;
+  animation: escribir 1.6s cubic-bezier(0.55, 0, 0.3, 1) 0.6s both;
+}
+
+.nombre:last-child {
+  animation-delay: 1.5s;
+}
+
+.amp {
+  display: block;
+  margin: -0.12em 0 -0.08em;
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 0.5em;
+  color: var(--oro);
+  animation: aparecer 0.8s ease 1.2s both;
+}
+
+/* filete dorado bajo los nombres */
+.filete {
+  display: block;
+  width: 120px;
+  height: 1px;
+  margin: 14px auto 0;
+  background: linear-gradient(90deg, transparent, var(--oro), transparent);
+  animation: dibujar 1.1s ease 2.9s both;
+}
+
+.dia-boda {
+  margin: 12px 0 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.8rem;
   font-weight: 500;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin: 0;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  animation: aparecer 1.1s ease 3.2s both;
 }
 
-/* FECHA ABAJO */
-.fecha-evento {
-  width: 60%;
-  max-width: 210px;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+.fecha {
+  margin: 10px 0 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: #fff;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  animation: aparecer 1.1s ease 3.5s both;
 }
 
-/* REPRODUCTOR DE VIDEO */
-.hero-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* INDICADOR FLECHA DESLIZAR ABAJO */
 .indicador-scroll {
   position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
+  bottom: 104px;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: 0 auto;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  color: #ffffff;
-  pointer-events: none;
-  animation: fadeIn 0.8s ease-out forwards;
+  gap: 4px;
+  color: var(--oro-oscuro);
+  text-decoration: none;
+  animation: aparecer 1s ease 4.2s both;
 }
 
 .texto-desliza {
-  margin: 0;
-  font-size: 0.85rem;
+  font-family: "Cinzel", serif;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 3px;
 }
 
 .flecha-saltarina {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
   animation: rebotar 1.8s infinite;
 }
 
-/* ANIMACIONES */
-@keyframes latidoZoomSello {
-  0% {
-    transform: scale(1);
+@keyframes escribir {
+  from {
+    clip-path: inset(0 100% 0 0);
+    filter: blur(3px);
   }
-  30% {
-    transform: scale(1.15);
+  to {
+    clip-path: inset(0 0 0 0);
+    filter: blur(0);
   }
-  50% {
-    transform: scale(1.05);
+}
+
+@keyframes dibujar {
+  from {
+    width: 0;
   }
-  70% {
-    transform: scale(1.2);
+  to {
+    width: 120px;
   }
-  100% {
-    transform: scale(1);
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -299,36 +295,33 @@ async function iniciarExperiencia() {
     transform: translateY(0);
   }
   40% {
-    transform: translateY(-12px);
+    transform: translateY(-8px);
   }
   60% {
-    transform: translateY(-6px);
+    transform: translateY(-4px);
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 10px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
+/* Sin animación si el usuario lo prefiere: se muestra directamente el final */
+@media (prefers-reduced-motion: reduce) {
+  .hero-section *,
+  .hero-section *::before {
+    animation: none !important;
   }
 }
 
-@media (max-height: 660px) {
+@media (max-height: 700px) {
+  .indicador-scroll {
+    display: none;
+  }
   .hero-contenido {
-    gap: 0.6rem;
+    padding: 90px 16px 80px;
   }
-  .titulo-vale {
-    max-width: 210px;
-  }
-  .sobre-wrapper {
-    max-width: 250px;
-  }
-  .fecha-evento {
-    max-width: 160px;
+}
+
+@media (max-height: 640px) {
+  .nombres {
+    font-size: 3.2rem;
   }
 }
 </style>

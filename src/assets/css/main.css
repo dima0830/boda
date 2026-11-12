@@ -1,19 +1,299 @@
 @import "tailwindcss";
 
+/*
+  ESTILO "INVITACIÓN CON ROSAS"
+  Inspirado en el video de ejemplo: fondo crema, guirnaldas de rosas blancas,
+  letras con serifa, nombres en cursiva, detalles dorados y botones verde oscuro.
+*/
+:root {
+  --crema: #f7f3ec; /* fondo de la invitación */
+  --tarjeta: #fdfbf7; /* tarjetas y ventanas */
+  --fondo-mesa: #e4ddd1; /* alrededor de la invitación (escritorio) */
+  --verde: #3e5b3f; /* botones e íconos */
+  --verde-oscuro: #2e4630;
+  --oro: #b8955a;
+  --oro-claro: #d8c29a;
+  --linea: #e2d7c3;
+  --titulo: #4d4b43;
+  --tinta: #5c5a50;
+
+  --fuente-titulo: "Cormorant Garamond", "Garamond", serif;
+  --fuente-texto: "Cormorant Garamond", "Garamond", serif;
+  --fuente-mayus: "Cinzel", "Trajan Pro", serif;
+  --fuente-cursiva: "Great Vibes", cursive;
+}
+
 * {
   box-sizing: border-box;
 }
+
 html {
   scroll-behavior: smooth;
+  /* "proximity": solo encaja cuando el scroll termina cerca de una tarjeta */
+  scroll-snap-type: y proximity;
 }
+
 body {
   margin: 0;
-  background-color: red;
-  background-image: url("../images/back.jpg");
-  background-position: center;
-  background-size: cover;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  color: var(--ink);
-  font-family: "Poppins", sans-serif;
+  min-height: 100vh;
+  background: var(--fondo-mesa);
+  color: var(--tinta);
+  font-family: var(--fuente-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* La invitación: a todo el ancho en el móvil, centrada como una tarjeta en pantallas grandes */
+.invitation-shell {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  /* el fondo lo pone el video; las secciones crema llevan .panel */
+  background: #2a261d;
+  overflow-x: clip;
+}
+
+/* Panel crema que pasa por encima del video al hacer scroll */
+.panel {
+  background: var(--crema);
+}
+
+@media (min-width: 560px) {
+  .invitation-shell {
+    margin: 32px auto;
+    border-radius: 24px;
+    overflow: clip;
+    box-shadow:
+      0 30px 60px -20px rgba(60, 50, 30, 0.3),
+      0 10px 24px -12px rgba(60, 50, 30, 0.2);
+  }
+}
+
+/* SECCIONES COMUNES */
+.seccion {
+  position: relative;
+  padding: 40px 28px;
+  text-align: center;
+}
+
+.titulo-seccion {
+  margin: 0 0 6px;
+  font-family: var(--fuente-titulo);
+  font-size: 2.3rem;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--titulo);
+}
+
+/* filete dorado bajo los títulos */
+.titulo-seccion::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 1px;
+  margin: 10px auto 0;
+  background: linear-gradient(90deg, transparent, var(--oro), transparent);
+}
+
+.titulo-mayus {
+  margin: 0 0 6px;
+  font-family: var(--fuente-mayus);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--verde-oscuro);
+}
+
+.antetitulo {
+  margin: 0 auto 14px;
+  max-width: 300px;
+  font-family: var(--fuente-mayus);
+  font-size: 0.68rem;
+  letter-spacing: 2.5px;
+  line-height: 1.6;
+  color: var(--oro);
+}
+
+.texto-seccion {
+  margin: 0 auto;
+  max-width: 340px;
+  font-size: 1.08rem;
+  line-height: 1.45;
+  color: var(--tinta);
+}
+
+.icono-linea {
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin: 14px auto;
+  color: var(--titulo);
+}
+
+.btn-verde {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 150px;
+  margin-top: 18px;
+  padding: 8px 24px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--verde);
+  color: #fff;
+  font-family: var(--fuente-texto);
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px -4px rgba(46, 70, 48, 0.5);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-verde:hover {
+  background: var(--verde-oscuro);
+  transform: translateY(-1px);
+}
+
+.btn-verde:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tarjeta blanca flotante (Celebración, Música, Dress code…) */
+.tarjeta {
+  position: relative;
+  padding: 30px 24px 28px;
+  border-radius: 14px;
+  background: var(--tarjeta);
+  box-shadow:
+    0 18px 40px -18px rgba(60, 50, 30, 0.35),
+    0 2px 6px rgba(60, 50, 30, 0.06);
+  text-align: center;
+}
+
+/* CAMPOS DE FORMULARIO (ventanas de confirmación y canción) */
+.campo {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  text-align: left;
+}
+
+.campo-etiqueta {
+  display: block;
+  margin-bottom: 2px;
+  padding: 0;
+  font-family: var(--fuente-mayus);
+  font-size: 0.66rem;
+  letter-spacing: 1.5px;
+  color: var(--oro);
+}
+
+.campo-entrada {
+  width: 100%;
+  padding: 8px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--linea);
+  background: transparent;
+  font-family: var(--fuente-texto);
+  font-size: 1.05rem;
+  color: var(--titulo);
+  outline: none;
+}
+
+.campo-entrada::placeholder {
+  color: #a9a395;
+  font-style: italic;
+}
+
+.campo-entrada:focus {
+  border-bottom-color: var(--verde);
+}
+
+/* ANIMACIONES AL HACER SCROLL (directiva v-revelar)
+   Los hijos del elemento aparecen uno tras otro; las tarjetas suben flotando
+   con un leve zoom y, dentro de ellas, su contenido también va apareciendo. */
+.revelar > *,
+.revelar .tarjeta > * {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.revelar > .tarjeta,
+.tarjeta.revelar {
+  transform: translateY(46px) scale(0.94);
+}
+
+.tarjeta.revelar {
+  opacity: 0;
+  transition:
+    opacity 0.8s ease,
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.revelar.visible > *,
+.revelar.visible .tarjeta > *,
+.tarjeta.revelar.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* retardos escalonados */
+.revelar.visible > :nth-child(2),
+.revelar.visible .tarjeta > :nth-child(2) { transition-delay: 0.12s; }
+.revelar.visible > :nth-child(3),
+.revelar.visible .tarjeta > :nth-child(3) { transition-delay: 0.24s; }
+.revelar.visible > :nth-child(4),
+.revelar.visible .tarjeta > :nth-child(4) { transition-delay: 0.36s; }
+.revelar.visible > :nth-child(5),
+.revelar.visible .tarjeta > :nth-child(5) { transition-delay: 0.48s; }
+.revelar.visible > :nth-child(6),
+.revelar.visible .tarjeta > :nth-child(6) { transition-delay: 0.6s; }
+.revelar.visible > :nth-child(n + 7),
+.revelar.visible .tarjeta > :nth-child(n + 7) { transition-delay: 0.72s; }
+
+/* el contenido de una tarjeta empieza cuando la tarjeta ya está subiendo */
+.revelar.visible .tarjeta > * {
+  transition-delay: calc(0.25s + var(--retardo, 0s));
+}
+.revelar.visible .tarjeta > :nth-child(2) { --retardo: 0.12s; }
+.revelar.visible .tarjeta > :nth-child(3) { --retardo: 0.24s; }
+.revelar.visible .tarjeta > :nth-child(4) { --retardo: 0.36s; }
+.revelar.visible .tarjeta > :nth-child(5) { --retardo: 0.48s; }
+.revelar.visible .tarjeta > :nth-child(n + 6) { --retardo: 0.6s; }
+
+/* el filete dorado de los títulos se dibuja desde el centro */
+.revelar .titulo-seccion::after {
+  width: 0;
+  transition: width 1s ease 0.5s;
+}
+.revelar.visible .titulo-seccion::after {
+  width: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .revelar > *,
+  .revelar .tarjeta > *,
+  .tarjeta.revelar {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .revelar .titulo-seccion::after {
+    width: 64px;
+  }
 }

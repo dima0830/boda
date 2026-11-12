@@ -1,309 +1,319 @@
 <template>
-  <section
-    ref="sectionRef"
-    class="presentacion-section"
-    :class="{ 'is-visible': isVisible }"
-  >
-    <!-- DECORACIÓN SUPERIOR -->
-    <img
-      src="@/assets/images/mariposa.png"
-      alt="Mariposa decorativa"
-      class="deco mariposa-top-left animar-mariposa-1"
-    />
-    <img
-      src="@/assets/images/mariposa-.png"
-      alt="Mariposa pequeña"
-      class="deco mariposa-top-right animar-mariposa-2"
-    />
+  <!-- VER LA FECHA: tres círculos para raspar con el dedo (o el ratón) -->
+  <section id="fecha" class="fecha-section panel">
 
-    <!-- MARCO PRINCIPAL -->
-    <div class="marco-container animar-marco">
-      <img
-        src="@/assets/images/marco.png"
-        alt="Foto Quinceañera"
-        class="marco-img"
-      />
-    </div>
+    <div v-revelar class="seccion contenido">
+      <h2 class="titulo-seccion">Ver la fecha</h2>
+      <p class="antetitulo">{{ todosDescubiertos ? "¡Guarda la fecha!" : "Rasca los tres círculos para descubrir la fecha" }}</p>
 
-    <!-- SECCIÓN INFERIOR: TIANA Y TEXTO -->
-    <div class="inferior-container">
-      <img
-        src="@/assets/images/tiana.png"
-        alt="Princesa Tiana"
-        class="tiana-img animar-tiana"
-      />
-
-      <div class="texto-container animar-texto">
-        <p class="mensaje">
-          Dicen que si le pides un deseo a la estrella más brillante, con el
-          corazón y trabajo duro, los sueños se hacen realidad. Hoy celebro el
-          inicio de los míos. ¡Acompáñame a festejar mis 15 años!
-        </p>
+      <div class="circulos">
+        <div
+          v-for="(item, i) in partes"
+          :key="item.etiqueta"
+          class="circulo"
+          :class="['c' + i, { descubierto: descubiertos[i] }]"
+        >
+          <div class="valor">
+            <span class="numero" :class="{ largo: item.valor.length > 4 }">{{ item.valor }}</span>
+            <span class="etiqueta">{{ item.etiqueta }}</span>
+          </div>
+          <canvas
+            v-if="!retirados[i]"
+            :ref="(el) => (lienzos[i] = el as HTMLCanvasElement | null)"
+            class="rasca"
+            role="button"
+            tabindex="0"
+            :aria-label="`Raspar para descubrir el ${item.etiqueta.toLowerCase()}`"
+            @pointerdown="empezar(i, $event)"
+            @pointermove="mover(i, $event)"
+            @pointerup="terminar(i)"
+            @pointercancel="terminar(i)"
+            @keydown.enter.prevent="descubrir(i)"
+            @keydown.space.prevent="descubrir(i)"
+          ></canvas>
+        </div>
       </div>
 
-      <!-- DECORACIÓN INFERIOR -->
-      <img
-        src="@/assets/images/mariposa.png"
-        alt="Mariposa decorativa"
-        class="deco mariposa-bottom-right animar-mariposa-3"
-      />
+      <!-- Confeti al descubrir los tres -->
+      <div v-if="todosDescubiertos" class="confeti" aria-hidden="true">
+        <span v-for="p in confeti" :key="p.id" class="pieza" :style="p.estilo"></span>
+      </div>
     </div>
-
-    <!-- MARIPOSA CENTRO ABAJO -->
-    <img
-      src="@/assets/images/mariposa.png"
-      alt="Mariposa decorativa"
-      class="deco mariposa-bottom-center animar-mariposa-4"
-    />
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 
-const sectionRef = ref<HTMLElement | null>(null);
-const isVisible = ref(false);
+const partes = [
+  { valor: "22", etiqueta: "Día" },
+  { valor: "Diciembre", etiqueta: "Mes" },
+  { valor: "2026", etiqueta: "Año" },
+];
 
-let observer: IntersectionObserver | null = null;
+const PORCENTAJE_PARA_DESCUBRIR = 0.45;
+const RADIO_PINCEL = 15;
 
-onMounted(() => {
-  observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) {
-        isVisible.value = true;
-        if (observer && sectionRef.value) {
-          observer.unobserve(sectionRef.value); // Se ejecuta una sola vez al hacer scroll
-        }
-      }
-    },
-    { threshold: 0.25 }, // Se activa cuando el 25% de la sección entra en pantalla
-  );
+const lienzos: (HTMLCanvasElement | null)[] = [];
+const descubiertos = reactive([false, false, false]);
+const retirados = reactive([false, false, false]);
+const todosDescubiertos = computed(() => descubiertos.every(Boolean));
 
-  if (sectionRef.value) {
-    observer.observe(sectionRef.value);
+const rascando = ref<number | null>(null);
+const ultimoPunto: ({ x: number; y: number } | null)[] = [null, null, null];
+
+/* Piezas de confeti dorado y verde con posición y retardo al azar */
+const colores = ["#b8955a", "#d8c29a", "#3e5b3f", "#e9dcc0", "#8fa58a"];
+const confeti = Array.from({ length: 46 }, (_, id) => ({
+  id,
+  estilo: {
+    left: `${Math.random() * 100}%`,
+    background: colores[id % colores.length],
+    animationDelay: `${Math.random() * 0.6}s`,
+    animationDuration: `${2.2 + Math.random() * 1.6}s`,
+    "--giro": `${Math.random() * 720 - 360}deg`,
+    "--deriva": `${Math.random() * 80 - 40}px`,
+    width: `${5 + Math.random() * 5}px`,
+    height: `${8 + Math.random() * 6}px`,
+  },
+}));
+
+function pintarCapa(lienzo: HTMLCanvasElement) {
+  const tam = lienzo.clientWidth;
+  const dpr = window.devicePixelRatio || 1;
+  lienzo.width = tam * dpr;
+  lienzo.height = tam * dpr;
+  const ctx = lienzo.getContext("2d");
+  if (!ctx) return;
+  ctx.scale(dpr, dpr);
+
+  // capa perlada, como una tarjeta de raspar
+  const brillo = ctx.createRadialGradient(tam * 0.35, tam * 0.3, 4, tam / 2, tam / 2, tam / 2);
+  brillo.addColorStop(0, "#fbf8f2");
+  brillo.addColorStop(0.6, "#ece5d8");
+  brillo.addColorStop(1, "#d9cfbd");
+  ctx.fillStyle = brillo;
+  ctx.beginPath();
+  ctx.arc(tam / 2, tam / 2, tam / 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#8d8472";
+  ctx.font = `600 ${Math.round(tam * 0.12)}px Cinzel, serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("RASPE", tam / 2, tam / 2);
+}
+
+function puntoEn(lienzo: HTMLCanvasElement, e: PointerEvent) {
+  const r = lienzo.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function rascar(i: number, p: { x: number; y: number }) {
+  const ctx = lienzos[i]?.getContext("2d");
+  if (!ctx) return;
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.lineCap = "round";
+  ctx.lineWidth = RADIO_PINCEL * 2;
+  const desde = ultimoPunto[i] ?? p;
+  ctx.beginPath();
+  ctx.moveTo(desde.x, desde.y);
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  ultimoPunto[i] = p;
+}
+
+function porcentajeRascado(lienzo: HTMLCanvasElement) {
+  const ctx = lienzo.getContext("2d");
+  if (!ctx) return 0;
+  const { data } = ctx.getImageData(0, 0, lienzo.width, lienzo.height);
+  const centro = lienzo.width / 2;
+  let total = 0;
+  let borrado = 0;
+  // muestrea un píxel de cada 6, solo dentro del círculo
+  for (let y = 0; y < lienzo.height; y += 6) {
+    for (let x = 0; x < lienzo.width; x += 6) {
+      if ((x - centro) ** 2 + (y - centro) ** 2 > centro ** 2) continue;
+      total++;
+      if (data[(y * lienzo.width + x) * 4 + 3] < 128) borrado++;
+    }
   }
-});
+  return total ? borrado / total : 0;
+}
 
-onBeforeUnmount(() => {
-  if (observer) observer.disconnect();
+function empezar(i: number, e: PointerEvent) {
+  if (descubiertos[i]) return;
+  const lienzo = lienzos[i];
+  if (!lienzo) return;
+  lienzo.setPointerCapture(e.pointerId);
+  rascando.value = i;
+  ultimoPunto[i] = null;
+  rascar(i, puntoEn(lienzo, e));
+}
+
+function mover(i: number, e: PointerEvent) {
+  const lienzo = lienzos[i];
+  if (rascando.value !== i || !lienzo) return;
+  rascar(i, puntoEn(lienzo, e));
+}
+
+function terminar(i: number) {
+  if (rascando.value !== i) return;
+  rascando.value = null;
+  ultimoPunto[i] = null;
+  const lienzo = lienzos[i];
+  if (lienzo && porcentajeRascado(lienzo) >= PORCENTAJE_PARA_DESCUBRIR) descubrir(i);
+}
+
+function descubrir(i: number) {
+  if (descubiertos[i]) return;
+  descubiertos[i] = true;
+  // se desvanece lo que queda de la capa y luego se quita
+  setTimeout(() => (retirados[i] = true), 600);
+}
+
+onMounted(async () => {
+  // espera a la fuente Cinzel para escribir "RASPE" con ella
+  await document.fonts?.ready;
+  lienzos.forEach((l) => l && pintarCapa(l));
 });
 </script>
 
 <style scoped>
-/* CONTENEDOR PRINCIPAL */
-.presentacion-section {
+.fecha-section {
   position: relative;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.contenido {
+  padding-top: 100px;
+  padding-bottom: 28px;
+}
+
+.circulos {
+  display: grid;
+  grid-template-columns: repeat(2, 108px);
+  justify-content: center;
+  gap: 14px 22px;
+  margin-top: 10px;
+}
+
+/* el tercero, centrado debajo de los dos primeros (como en el video) */
+.circulo.c2 {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.circulo {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: var(--tarjeta);
+  box-shadow:
+    0 10px 22px -10px rgba(60, 50, 30, 0.4),
+    inset 0 0 0 1px var(--linea);
+}
+
+.valor {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Evita scroll horizontal mientras el texto entra desde la derecha */
-  overflow-x: clip;
-}
-
-/* MARCO CENTRAL */
-.marco-container {
-  position: relative;
-  width: 100%;
-  display: flex;
   justify-content: center;
-  z-index: 2;
-  margin-top: 20px;
 }
 
-.marco-img {
-  width: 85%;
-  max-width: 320px;
-  height: auto;
-}
-
-/* SECCIÓN INFERIOR (TIANA + TEXTO) */
-.inferior-container {
-  position: relative;
-  width: 100%;
-  margin-top: 10px;
-  display: flex;
-  align-items: flex-end;
-  gap: 4%;
-  min-height: 200px;
-  /* Deja sitio a las mariposas inferiores para que no tapen el texto */
-  padding-bottom: 45px;
-  z-index: 3;
-}
-
-/* TIANA (ancho fluido, sin solaparse con el texto) */
-.tiana-img {
-  flex: 0 0 auto;
-  width: clamp(105px, 34vw, 160px);
-  height: auto;
-  z-index: 5;
-}
-
-/* TEXTO */
-.texto-container {
-  flex: 1 1 auto;
-  min-width: 0;
-  margin-bottom: 10px;
-  z-index: 4;
-}
-
-.mensaje {
-  font-family: "Cormorant", serif;
-  color: #235848;
-  font-size: clamp(0.95rem, 4vw, 1.125rem);
-  line-height: 1.45;
-  text-align: left;
+.numero {
+  font-family: var(--fuente-titulo);
+  font-size: 2.1rem;
   font-weight: 500;
-  margin: 0;
+  line-height: 1;
+  color: var(--titulo);
 }
 
-/* MARIPOSAS */
-.deco {
+.numero.largo {
+  font-size: 1.25rem;
+}
+
+.etiqueta {
+  margin-top: 4px;
+  font-family: var(--fuente-mayus);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--oro);
+}
+
+.descubierto .numero {
+  animation: latido 0.6s ease;
+}
+
+.rasca {
   position: absolute;
-  z-index: 6;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  cursor: grab;
+  /* el dedo raspa en vez de desplazar la página */
+  touch-action: none;
+  transition: opacity 0.6s ease;
+}
+
+.rasca:active {
+  cursor: grabbing;
+}
+
+.rasca:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 3px;
+}
+
+.descubierto .rasca {
+  opacity: 0;
   pointer-events: none;
 }
 
-.mariposa-top-left {
-  top: 30px;
-  left: 20px;
-  width: 80px;
+/* CONFETI */
+.confeti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-.mariposa-top-right {
-  top: 60px;
-  right: 30px;
-  width: 40px;
-}
-
-.mariposa-bottom-right {
-  bottom: -15px;
-  right: 15px;
-  width: 55px;
-}
-
-.mariposa-bottom-center {
-  bottom: 10px;
-  left: 45%;
-  width: 65px;
-}
-
-/* =========================================
-   ESTADOS INICIALES (ANTES DE HACER SCROLL)
-   ========================================= */
-.animar-marco,
-.animar-tiana,
-.animar-texto,
-.animar-mariposa-1,
-.animar-mariposa-2,
-.animar-mariposa-3,
-.animar-mariposa-4 {
+.pieza {
+  position: absolute;
+  top: -12px;
+  border-radius: 2px;
   opacity: 0;
-  transition:
-    opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-    transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  animation: caer linear forwards;
 }
 
-.animar-marco {
-  transform: translateY(30px) scale(0.95);
-}
-
-.animar-tiana {
-  transform: translateX(-40px);
-}
-
-.animar-texto {
-  transform: translateX(30px);
-}
-
-.animar-mariposa-1 {
-  transform: rotate(-15deg) scale(0.5);
-}
-
-.animar-mariposa-2 {
-  transform: rotate(15deg) scale(0.5);
-}
-
-.animar-mariposa-3 {
-  transform: rotate(-10deg) scale(0.5);
-}
-
-.animar-mariposa-4 {
-  transform: translateX(-50%) rotate(5deg) scale(0.5);
-}
-
-/* =========================================
-   ESTADOS ACTIVOS (CUANDO ES VISIBLE EN PANTALLA)
-   ========================================= */
-
-/* 1. Entra el Marco de la Foto */
-.is-visible .animar-marco {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  transition-delay: 0.1s;
-}
-
-/* 2. Entra Princesa Tiana desde la izquierda */
-.is-visible .animar-tiana {
-  opacity: 1;
-  transform: translateX(0);
-  transition-delay: 0.3s;
-}
-
-/* 3. Entra el texto poético desde la derecha */
-.is-visible .animar-texto {
-  opacity: 1;
-  transform: translateX(0);
-  transition-delay: 0.5s;
-}
-
-/* 4. Entran y aletean las mariposas (escalonadas) */
-.is-visible .animar-mariposa-1 {
-  opacity: 1;
-  transform: rotate(-15deg) scale(1);
-  transition-delay: 0.6s;
-  animation: aleteoSuave 3s ease-in-out infinite alternate 1.4s;
-}
-
-.is-visible .animar-mariposa-2 {
-  opacity: 1;
-  transform: rotate(15deg) scale(1);
-  transition-delay: 0.7s;
-  animation: aleteoSuave 3.5s ease-in-out infinite alternate 1.5s;
-}
-
-.is-visible .animar-mariposa-3 {
-  opacity: 1;
-  transform: rotate(-10deg) scale(1);
-  transition-delay: 0.8s;
-  animation: aleteoSuave 2.8s ease-in-out infinite alternate 1.6s;
-}
-
-.is-visible .animar-mariposa-4 {
-  opacity: 1;
-  transform: translateX(-50%) rotate(5deg) scale(1);
-  transition-delay: 0.9s;
-  animation: aleteoSuave 3.2s ease-in-out infinite alternate 1.7s;
-}
-
-/* Animación sutil de aleteo/flotación continuo para las mariposas */
-@keyframes aleteoSuave {
+@keyframes caer {
   0% {
-    transform: translateY(0px) rotate(-5deg);
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  85% {
+    opacity: 1;
   }
   100% {
-    transform: translateY(-8px) rotate(5deg);
+    opacity: 0;
+    transform: translate(var(--deriva), 440px) rotate(var(--giro));
   }
 }
 
-/* Ajustes responsive */
-@media (max-width: 360px) {
-  .inferior-container {
-    gap: 3%;
+@keyframes latido {
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confeti {
+    display: none;
   }
 }
 </style>

@@ -14,6 +14,7 @@ declare module 'vue' {
     CountdownTimer: typeof import('./src/components/CountdownTimer.vue')['default']
     DressCodeSection: typeof import('./src/components/DressCodeSection.vue')['default']
     GalleryCarousel: typeof import('./src/components/GalleryCarousel.vue')['default']
+    GuirnaldaFlores: typeof import('./src/components/GuirnaldaFlores.vue')['default']
     InvitationAudio: typeof import('./src/components/InvitationAudio.vue')['default']
     InvitationCelebration: typeof import('./src/components/InvitationCelebration.vue')['default']
     InvitationDetails: typeof import('./src/components/InvitationDetails.vue')['default']
@@ -23,10 +24,14 @@ declare module 'vue' {
     InvitationHero: typeof import('./src/components/InvitationHero.vue')['default']
     InvitationIntro: typeof import('./src/components/InvitationIntro.vue')['default']
     InvitationMemories: typeof import('./src/components/InvitationMemories.vue')['default']
+    InvitationMusica: typeof import('./src/components/InvitationMusica.vue')['default']
     MainHeader: typeof import('./src/components/MainHeader.vue')['default']
     PhotosUp: typeof import('./src/components/PhotosUp.vue')['default']
     PhotoUpload: typeof import('./src/components/PhotoUpload.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TarjetaDetalle: typeof import('./src/components/TarjetaDetalle.vue')['default']
+    VentanaModal: typeof import('./src/components/VentanaModal.vue')['default']
+    VideoFondo: typeof import('./src/components/VideoFondo.vue')['default']
   }
 }

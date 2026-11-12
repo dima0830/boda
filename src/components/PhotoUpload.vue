@@ -1,107 +1,45 @@
 <template>
-  <section class="fotos-up-section">
-    <div class="fotos-up-card">
-      <!-- TÍTULO CON EL ESTILO DE LA IMAGEN DE REFERENCIA -->
-      <div class="header-titulo">
-        <span class="titulo-cursiva">Comparte tus</span>
-        <h2 class="titulo-mayuscula">RECUERDOS</h2>
-      </div>
+  <section class="fotos-section panel">
+    <div v-revelar class="seccion">
+      <h2 class="titulo-seccion">Compartimos este día junto a ti</h2>
+      <p class="texto-seccion">Comparte tus fotos y videos de este hermoso día</p>
 
-      <p class="section-description">
-        En este día tan especial, comparte tus fotografías con nosotros.
-      </p>
+      <!-- Ícono de línea: fotos -->
+      <svg class="icono-linea" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="6" y="12" width="30" height="26" rx="2" />
+        <path d="M12 8h30v26" />
+        <circle cx="15" cy="20" r="3" />
+        <path d="M6 33l9-8 7 6 5-4 9 8" />
+      </svg>
 
-      <!-- ÁREA INTERACTIVA PARA SUBIR IMÁGENES -->
-      <div
-        class="dropzone"
-        :class="{ 'is-dragging': isDragging }"
-        @dragover.prevent="isDragging = true"
-        @dragleave.prevent="isDragging = false"
-        @drop.prevent="handleDrop"
-        @click="triggerFileInput"
-      >
-        <input
-          ref="fileInputRef"
-          type="file"
-          accept="image/*"
-          multiple
-          class="hidden-file-input"
-          @change="handleFileSelect"
-        />
+      <input
+        ref="fileInputRef"
+        type="file"
+        accept="image/*,video/*"
+        multiple
+        class="input-oculto"
+        @change="handleFileSelect"
+      />
 
-        <div class="dropzone-content">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="38"
-            height="38"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="upload-icon"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
-          <p class="dropzone-text">
-            Arrastra tus fotos aquí o <span>haz clic para seleccionar</span>
-          </p>
-          <span class="file-limit">Formatos permitidos: JPG, PNG, WEBP</span>
+      <!-- VISTA PREVIA -->
+      <div v-if="selectedFiles.length" class="preview-grid">
+        <div v-for="(file, index) in selectedFiles" :key="file.preview" class="preview-item">
+          <video v-if="file.file.type.startsWith('video/')" :src="file.preview" muted playsinline></video>
+          <img v-else :src="file.preview" :alt="file.name" />
+          <button type="button" class="btn-remove" :aria-label="`Quitar ${file.name}`" @click="removeFile(index)">✕</button>
         </div>
       </div>
 
-      <!-- VISTA PREVIA DE LAS FOTOS SELECCIONADAS -->
-      <div v-if="selectedFiles.length" class="preview-container">
-        <h3 class="preview-title">
-          Fotografías seleccionadas ({{ selectedFiles.length }})
-        </h3>
-        <div class="preview-grid">
-          <div
-            v-for="(file, index) in selectedFiles"
-            :key="file.name + index"
-            class="preview-item"
-          >
-            <img :src="file.preview" :alt="file.name" />
-            <button
-              type="button"
-              class="btn-remove"
-              title="Quitar foto"
-              @click.stop="removeFile(index)"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- BOTONES DE ACCIÓN: GUARDAR Y ENVIAR -->
-      <div class="actions-group">
-        <button
-          type="button"
-          class="btn-secondary"
-          :disabled="!selectedFiles.length || isSubmitting"
-          @click="guardarBorrador"
-        >
-          Guardar
+      <div class="acciones">
+        <button type="button" class="btn-verde" :disabled="isSubmitting" @click="triggerFileInput">
+          {{ selectedFiles.length ? "Añadir más" : "Subir fotos" }}
         </button>
-        <button
-          type="button"
-          class="btn-primary"
-          :disabled="!selectedFiles.length || isSubmitting"
-          @click="enviarFotos"
-        >
-          <span v-if="isSubmitting">Enviando...</span>
-          <span v-else>Enviar Fotografías</span>
+        <button v-if="selectedFiles.length" type="button" class="btn-verde" :disabled="isSubmitting" @click="enviarFotos">
+          {{ isSubmitting ? "Enviando..." : `Enviar (${selectedFiles.length})` }}
         </button>
       </div>
 
-      <!-- MENSAJE DE CONFIRMACIÓN O ERROR -->
-      <p v-if="statusMessage" class="status-message" :class="statusType">
-        {{ statusMessage }}
-      </p>
+      <p v-if="statusMessage" class="status-message" :class="statusType">{{ statusMessage }}</p>
     </div>
   </section>
 </template>
@@ -117,7 +55,6 @@ interface PreviewFile {
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const selectedFiles = ref<PreviewFile[]>([]);
-const isDragging = ref(false);
 const isSubmitting = ref(false);
 const statusMessage = ref("");
 const statusType = ref<"success" | "error">("success");
@@ -126,43 +63,25 @@ function triggerFileInput() {
   fileInputRef.value?.click();
 }
 
-function addFiles(files: FileList | File[]) {
-  Array.from(files).forEach((file) => {
-    if (file.type.startsWith("image/")) {
-      const preview = URL.createObjectURL(file);
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (!target.files) return;
+  Array.from(target.files).forEach((file) => {
+    if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
       selectedFiles.value.push({
         file,
         name: file.name,
-        preview,
+        preview: URL.createObjectURL(file),
       });
     }
   });
-}
-
-function handleFileSelect(event: Event) {
-  const target = event.target as HTMLInputElement;
-  if (target.files) {
-    addFiles(target.files);
-    target.value = "";
-  }
-}
-
-function handleDrop(event: DragEvent) {
-  isDragging.value = false;
-  if (event.dataTransfer?.files) {
-    addFiles(event.dataTransfer.files);
-  }
+  target.value = "";
+  statusMessage.value = "";
 }
 
 function removeFile(index: number) {
   URL.revokeObjectURL(selectedFiles.value[index].preview);
   selectedFiles.value.splice(index, 1);
-}
-
-function guardarBorrador() {
-  statusType.value = "success";
-  statusMessage.value = "Tus fotos se guardaron temporalmente.";
-  setTimeout(() => (statusMessage.value = ""), 4000);
 }
 
 async function enviarFotos() {
@@ -177,15 +96,15 @@ async function enviarFotos() {
       formData.append(`fotos[${index}]`, item.file);
     });
 
-    // Simulación del envío al servidor
+    // Simulación del envío al servidor (aún no hay backend para las fotos)
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     statusType.value = "success";
-    statusMessage.value = "¡Gracias por compartir tus fotografías!";
+    statusMessage.value = "¡Gracias por compartir tus recuerdos!";
 
     selectedFiles.value.forEach((item) => URL.revokeObjectURL(item.preview));
     selectedFiles.value = [];
-  } catch (error) {
+  } catch {
     statusType.value = "error";
     statusMessage.value = "Error al subir las imágenes. Inténtalo de nuevo.";
   } finally {
@@ -195,142 +114,44 @@ async function enviarFotos() {
 </script>
 
 <style scoped>
-/* IMPORTACIÓN DE FUENTE CURSIVA Y SERIF */
-@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&display=swap");
-
-.fotos-up-section {
-  width: 100%;
-  padding: 2.5rem 1rem;
-  display: flex;
-  justify-content: center;
-  box-sizing: border-box;
+.fotos-section {
+  overflow: hidden;
 }
 
-.fotos-up-card {
-  width: 100%;
-  max-width: 500px;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(181, 152, 72, 0.2);
-  text-align: center;
-  box-sizing: border-box;
+.fotos-section .seccion {
+  padding-top: 100px;
+  padding-bottom: 20px;
 }
 
-/* ESTILOS DEL TÍTULO SEGÚN LA IMAGEN */
-.header-titulo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.titulo-cursiva {
-  font-family: "Great Vibes", "Alex Brush", cursive;
-  font-size: 2.6rem;
-  color: #c49a45; /* Tono dorado elegante */
-  line-height: 0.9;
-  margin-bottom: -6px; /* Superpone suavemente la palabra */
-  text-transform: none;
-}
-
-.titulo-mayuscula {
-  font-family: "Cinzel", "Playfair Display", "Times New Roman", serif;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #1a3c34; /* Verde esmeralda oscuro */
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin: 0;
-  line-height: 1.1;
-}
-
-.section-description {
-  font-size: 0.92rem;
-  color: #555555;
-  margin-top: 0.8rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.4;
-}
-
-/* ZONA DE CARGA */
-.dropzone {
-  border: 2px dashed #c49a45;
-  border-radius: 14px;
-  padding: 1.8rem 1rem;
-  background-color: #faf8f5;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.dropzone:hover,
-.dropzone.is-dragging {
-  background-color: #f4efe8;
-  border-color: #8c7331;
-}
-
-.hidden-file-input {
+.input-oculto {
   display: none;
 }
 
-.dropzone-content {
+.acciones {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.upload-icon {
-  color: #c49a45;
-}
-
-.dropzone-text {
-  font-size: 0.9rem;
-  color: #444444;
-  margin: 0;
-}
-
-.dropzone-text span {
-  color: #c49a45;
-  font-weight: 600;
-  text-decoration: underline;
-}
-
-.file-limit {
-  font-size: 0.75rem;
-  color: #888888;
-}
-
-/* VISTA PREVIA */
-.preview-container {
-  margin-top: 1.5rem;
-  text-align: left;
-}
-
-.preview-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #555555;
-  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 12px;
 }
 
 .preview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
+  max-width: 340px;
+  margin: 6px auto 0;
 }
 
 .preview-item {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 8px;
+  aspect-ratio: 1;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 8px rgba(60, 50, 30, 0.2);
 }
 
-.preview-item img {
+.preview-item img,
+.preview-item video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -340,96 +161,27 @@ async function enviarFotos() {
   position: absolute;
   top: 4px;
   right: 4px;
+  display: grid;
+  place-items: center;
   width: 20px;
   height: 20px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
-  color: #ffffff;
-  border: none;
-  font-size: 0.7rem;
+  background: rgba(30, 30, 20, 0.65);
+  color: #fff;
+  font-size: 0.65rem;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-remove:hover {
-  background: rgba(220, 38, 38, 0.9);
-}
-
-/* BOTONES DE ACCIÓN */
-.actions-group {
-  display: flex;
-  gap: 12px;
-  margin-top: 1.8rem;
-}
-
-.btn-primary,
-.btn-secondary {
-  flex: 1;
-  padding: 0.8rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-}
-
-.btn-primary {
-  background: #1a3c34; /* Verde esmeralda para el botón principal */
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(26, 60, 52, 0.25);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #122c26;
-}
-
-.btn-secondary {
-  background: transparent;
-  color: #c49a45;
-  border: 1.5px solid #c49a45;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: rgba(196, 154, 69, 0.08);
-}
-
-.btn-primary:disabled,
-.btn-secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
 }
 
 .status-message {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 0.6rem;
-  border-radius: 8px;
-}
-
-.status-message.success {
-  background-color: #e6f4ea;
-  color: #1e7e34;
+  margin: 16px 0 0;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--verde);
 }
 
 .status-message.error {
-  background-color: #fce8e6;
-  color: #d93025;
-}
-
-@media (max-width: 480px) {
-  .actions-group {
-    flex-direction: column;
-  }
-  .titulo-cursiva {
-    font-size: 2.2rem;
-  }
-  .titulo-mayuscula {
-    font-size: 1.5rem;
-  }
+  color: #9b3b26;
 }
 </style>

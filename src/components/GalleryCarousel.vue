@@ -1,215 +1,175 @@
 <template>
-  <div v-if="images.length" class="gallery-carousel" aria-live="polite">
-    <div class="gallery-frame-wrapper">
-      <!-- MARIPOSAS DECORATIVAS CON LAS IMÁGENES -->
-      <img
-        src="@/assets/images/mariposa.png"
-        alt="Mariposa esmeralda y dorada"
-        class="mariposa-img m1"
-      />
-      <img
-        src="@/assets/images/mariposa-.png"
-        alt="Mariposa verde perfil"
-        class="mariposa-img m2"
-      />
-      <img
-        src="@/assets/images/mariposa.png"
-        alt="Mariposa esmeralda y dorada"
-        class="mariposa-img m3"
-      />
-      <img
-        src="@/assets/images/mariposa-.png"
-        alt="Mariposa verde perfil"
-        class="mariposa-img m4"
-      />
+  <div v-if="images.length" class="carrusel" aria-roledescription="carrusel" aria-label="Fotos">
+    <!-- Pista deslizable: se puede arrastrar con el dedo; las flechas y puntos la mueven -->
+    <div ref="pistaRef" class="pista" @scroll.passive="alDesplazar">
+      <figure v-for="(image, i) in images" :key="i" class="foto" :aria-hidden="i !== actual">
+        <img :src="image.src" :alt="image.alt" loading="lazy" />
+      </figure>
+    </div>
 
-      <!-- CONTENEDOR DE LA IMAGEN (275px x 348px) -->
-      <div class="gallery-frame">
-        <img :src="images[current].src" :alt="images[current].alt" />
-      </div>
+    <button type="button" class="flecha anterior" aria-label="Foto anterior" @click="ir(actual - 1)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
+    <button type="button" class="flecha siguiente" aria-label="Foto siguiente" @click="ir(actual + 1)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+    </button>
 
-      <!-- FLECHAS LATERALES -->
-      <button 
-        type="button" 
-        class="gallery-arrow gallery-prev" 
-        aria-label="Imagen anterior"
-        @click="prev"
-      >
-        &#10094;
-      </button>
-      <button 
-        type="button" 
-        class="gallery-arrow gallery-next" 
-        aria-label="Imagen siguiente"
-        @click="next"
-      >
-        &#10095;
-      </button>
+    <div class="puntos">
+      <button
+        v-for="(_, i) in images"
+        :key="i"
+        type="button"
+        class="punto"
+        :class="{ activo: i === actual }"
+        :aria-label="`Ir a la foto ${i + 1}`"
+        :aria-current="i === actual"
+        @click="ir(i)"
+      ></button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 interface Image {
   src: string;
   alt: string;
 }
 
-interface Props {
+const props = defineProps<{
   images: Image[];
+}>();
+
+const pistaRef = ref<HTMLElement | null>(null);
+const actual = ref(0);
+
+function ir(indice: number) {
+  const pista = pistaRef.value;
+  if (!pista) return;
+  const total = props.images.length;
+  const destino = (indice + total) % total;
+  pista.scrollTo({ left: destino * pista.clientWidth, behavior: "smooth" });
+  reiniciarAutoplay();
 }
 
-const props = defineProps<Props>();
-
-const current = ref(0);
-const total = computed(() => props.images.length);
-
-function next() {
-  current.value = current.value === total.value - 1 ? 0 : current.value + 1;
+function alDesplazar() {
+  const pista = pistaRef.value;
+  if (!pista) return;
+  actual.value = Math.round(pista.scrollLeft / pista.clientWidth);
 }
 
-function prev() {
-  current.value = current.value === 0 ? total.value - 1 : current.value - 1;
+// Avanza solo cada 6 segundos
+let autoplay: ReturnType<typeof setInterval> | null = null;
+
+function reiniciarAutoplay() {
+  if (autoplay) clearInterval(autoplay);
+  autoplay = setInterval(() => ir(actual.value + 1), 6000);
 }
 
-// Auto-advance
-let autoplayInterval: ReturnType<typeof setInterval> | null = null;
-
-onMounted(() => {
-  autoplayInterval = setInterval(() => {
-    next();
-  }, 15000);
-});
+onMounted(reiniciarAutoplay);
 
 onBeforeUnmount(() => {
-  if (autoplayInterval) clearInterval(autoplayInterval);
+  if (autoplay) clearInterval(autoplay);
 });
 </script>
 
 <style scoped>
-.gallery-carousel {
+.carrusel {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.pista {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-  width: 95%;
-  margin: 0 auto;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border: 8px solid var(--tarjeta);
+  border-radius: 4px;
+  background: var(--tarjeta);
+  box-shadow: 0 16px 32px -16px rgba(60, 50, 30, 0.45);
 }
 
-/* CONTENEDOR RELATIVO DEL TAMAÑO DE LA IMAGEN */
-.gallery-frame-wrapper {
-  position: relative;
-  width: 275px;
-  margin: 0 auto;
+.pista::-webkit-scrollbar {
+  display: none;
 }
 
-/* MARCO Y IMAGEN CON DIMENSIÓN EXACTA DE 275px x 348px */
-.gallery-frame {
-  position: relative;
-  overflow: hidden;
-  width: 275px;
-  height: 348px;
+.foto {
+  flex: 0 0 100%;
+  margin: 0;
   aspect-ratio: 275 / 348;
-  border-radius: 20px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-  background: #f4efe8;
+  scroll-snap-align: center;
+  background: #e9e3d8;
 }
 
-.gallery-frame img {
+.foto img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
-  transition: opacity 0.5s ease;
 }
 
-/* ESTILOS Y POSICIONAMIENTO DE LAS MARIPOSAS */
-.mariposa-img {
+.flecha {
   position: absolute;
-  height: auto;
-  z-index: 3;
-  pointer-events: none;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
-  animation: aleteo 3.5s ease-in-out infinite alternate;
-}
-
-/* Posiciones y tamaños individuales */
-.m1 {
-  width: 55px;
-  top: -20px;
-  left: -15px;
-  transform: rotate(-12deg);
-  animation-delay: 0s;
-}
-
-.m2 {
-  width: 42px;
-  top: 10px;
-  right: -18px;
-  transform: rotate(15deg);
-  animation-delay: 0.8s;
-}
-
-.m3 {
-  width: 48px;
-  bottom: -15px;
-  left: 10px;
-  transform: rotate(-25deg);
-  animation-delay: 1.5s;
-}
-
-.m4 {
-  width: 38px;
-  bottom: 15px;
-  right: -12px;
-  transform: rotate(5deg);
-  animation-delay: 2.2s;
-}
-
-/* Animación de flotación suave */
-@keyframes aleteo {
-  0% {
-    transform: translateY(0) rotate(0deg) scale(1);
-  }
-  100% {
-    transform: translateY(-6px) rotate(6deg) scale(1.04);
-  }
-}
-
-/* ESTILOS DE LAS FLECHAS LATERALES */
-.gallery-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(255, 255, 255, 0.8);
-  color: #b59848;
-  border: none;
+  top: calc(50% - 14px);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  cursor: pointer;
-  z-index: 4;
+  background: rgba(253, 251, 247, 0.92);
+  color: var(--verde);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  cursor: pointer;
+  transform: translateY(-50%);
 }
 
-.gallery-arrow:hover {
-  background-color: #ffffff;
-  color: #8c7233;
-  transform: translateY(-50%) scale(1.1);
+.flecha svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.gallery-prev {
-  left: -17px;
+.anterior {
+  left: -14px;
 }
 
-.gallery-next {
-  right: -17px;
+.siguiente {
+  right: -14px;
+}
+
+.puntos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.punto {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--oro-claro);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.punto.activo {
+  background: var(--verde);
+  transform: scale(1.25);
 }
 </style>

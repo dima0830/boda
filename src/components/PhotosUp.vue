@@ -1,16 +1,16 @@
 <template>
   <section class="audio-section">
     <div class="audio-card">
-      <!-- PERSONAJE IZQUIERDA (LUCIÉRNAGA) -->
+      <!-- ADORNO IZQUIERDA (RAMA FLORAL) -->
       <img
         src="@/assets/images/luci.png"
-        alt="Luciérnaga"
+        alt="Rama de eucalipto con rosas"
         class="ilustracion ray"
       />
 
       <!-- CONTENIDO CENTRAL -->
       <div class="audio-content">
-        <h2 class="audio-title">LA MAGIA EMPIEZA<br />CON UNA CANCIÓN...</h2>
+        <h2 class="audio-title">NUESTRA HISTORIA<br />TIENE BANDA SONORA...</h2>
 
         <!-- CONTROLES DE REPRODUCCIÓN -->
         <div class="player-controls">
@@ -45,7 +45,7 @@
         </div>
       </div>
 
-      <!-- PERSONAJE DERECHA (MARIPOSA) -->
+      <!-- ADORNO DERECHA (MARIPOSA) -->
       <img
         src="@/assets/images/mariposa.png"
         alt="Mariposa"

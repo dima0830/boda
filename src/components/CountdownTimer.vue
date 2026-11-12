@@ -1,83 +1,52 @@
 <template>
   <div class="countdown-timer">
-    <div class="timer-grid">
-      <div v-if="eventHasPassed" class="countdown-complete">
-        La celebración ya sucedió
+    <p v-if="eventHasPassed" class="countdown-complete">¡Hoy es el gran día!</p>
+    <div v-else class="timer-grid">
+      <div v-for="unidad in unidades" :key="unidad.etiqueta" class="time-unit">
+        <span class="time-value">{{ unidad.valor }}</span>
+        <span class="time-label">{{ unidad.etiqueta }}</span>
       </div>
-      <template v-else>
-        <div class="time-unit">
-          <div class="time-value">{{ dias }}</div>
-          <div class="time-label">Días</div>
-        </div>
-        <div class="time-unit">
-          <div class="time-value">{{ horas }}</div>
-          <div class="time-label">Horas</div>
-        </div>
-        <div class="time-unit">
-          <div class="time-value">{{ minutos }}</div>
-          <div class="time-label">Min</div>
-        </div>
-        <div class="time-unit">
-          <div class="time-value">{{ segundos }}</div>
-          <div class="time-label">Seg</div>
-        </div>
-      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 interface Props {
   eventDate?: string;
 }
 
-// FECHA CONFIGURADA: 22 de Abril de 2027 a las 06:00 PM (hora Colombia / UTC-5)
+// FECHA CONFIGURADA: 22 de diciembre de 2026 a las 6:00 p. m. (hora Colombia / UTC-5)
 const props = withDefaults(defineProps<Props>(), {
-  eventDate: "2027-04-23T18:00:00-05:00",
+  eventDate: "2026-12-22T18:00:00-05:00",
 });
 
-const dias = ref<string | number>(0);
-const horas = ref<string | number>("00");
-const minutos = ref<string | number>("00");
-const segundos = ref<string | number>("00");
-const eventHasPassed = ref(false);
+const restante = ref(0);
+const eventHasPassed = computed(() => restante.value <= 0);
+
+const unidades = computed(() => {
+  const ms = Math.max(restante.value, 0);
+  return [
+    { valor: Math.floor(ms / 86400000), etiqueta: "Días" },
+    { valor: Math.floor((ms % 86400000) / 3600000), etiqueta: "hs" },
+    { valor: Math.floor((ms % 3600000) / 60000), etiqueta: "min" },
+    { valor: Math.floor((ms % 60000) / 1000), etiqueta: "seg" },
+  ];
+});
 
 let interval: ReturnType<typeof setInterval> | null = null;
 
-// Función para rellenar con un cero a la izquierda si es menor a 10
-const padZero = (num: number) => String(num).padStart(2, "0");
-
 function calcularTiempo() {
-  const targetDate = new Date(props.eventDate).getTime();
-  
-  if (isNaN(targetDate)) {
+  const objetivo = new Date(props.eventDate).getTime();
+  if (isNaN(objetivo)) {
     console.error("Formato de fecha inválido en eventDate:", props.eventDate);
     return;
   }
-
-  const distance = targetDate - Date.now();
-  eventHasPassed.value = distance <= 0;
-
-  if (distance <= 0) {
-    dias.value = 0;
-    horas.value = "00";
-    minutos.value = "00";
-    segundos.value = "00";
-    return;
-  }
-
-  dias.value = Math.floor(distance / (1000 * 60 * 60 * 24));
-  horas.value = padZero(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-  minutos.value = padZero(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
-  segundos.value = padZero(Math.floor((distance % (1000 * 60)) / 1000));
+  restante.value = objetivo - Date.now();
 }
 
-// Reactiva el contador si cambias la propiedad externamente
-watch(() => props.eventDate, () => {
-  calcularTiempo();
-});
+watch(() => props.eventDate, calcularTiempo);
 
 onMounted(() => {
   calcularTiempo();
@@ -90,78 +59,44 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.countdown-timer {
-  width: 100%;
-  padding: 2.5rem 0;
-}
-
 .timer-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  justify-content: center;
-  justify-items: center;
-  max-width: min(100%, 320px);
-  margin: 0 auto;
+  max-width: 300px;
+  margin: 8px auto 0;
 }
 
 .time-unit {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  text-align: center;
-  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0;
 }
 
-.time-unit:hover {
-  transform: scale(1.1);
+/* líneas verticales finas entre las unidades */
+.time-unit + .time-unit {
+  border-left: 1px solid var(--linea);
 }
 
 .time-value {
-  font-size: clamp(3rem, 8vw, 4rem);
+  font-family: var(--fuente-titulo);
+  font-size: 2.4rem;
   font-weight: 500;
-  color: #20534a;
-  font-family: "Cormorant", serif;
-  line-height: 0.8;
+  line-height: 1.1;
+  color: var(--titulo);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .time-label {
-  margin-top: 0.75rem;
-  color: #20534a;
-  font-family: "Open Sans", sans-serif;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--tinta);
 }
 
 .countdown-complete {
-  grid-column: span 4;
-  font-family: "Cormorant", serif;
-  font-size: 1.5rem;
-  color: #20534a;
-  text-align: center;
-}
-
-/* Desde tablet la sección es una tarjeta de 390px: evita que los números toquen los bordes */
-@media (min-width: 600px) {
-  .time-value {
-    font-size: 3.25rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .timer-grid {
-    gap: 0.75rem;
-  }
-
-  .time-value {
-    font-size: clamp(1.1rem, 8vw, 2rem);
-  }
-
-  .time-label {
-    font-size: 0.7rem;
-  }
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-size: 1.6rem;
+  color: var(--titulo);
 }
 </style>

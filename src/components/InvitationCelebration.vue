@@ -1,545 +1,181 @@
 <template>
-  <section ref="seccionRef" class="invitacion-seccion">
-    <!-- ENCABEZADO Y PADRES -->
-    <div class="header-container fade-in-element">
-      <p class="subtitulo">
-        ACOMPÁÑAME EN ESTE DÍA TAN ESPECIAL JUNTO A MIS PADRES:
-      </p>
-
-      <div class="padres-box">
-        <h2 class="nombre-padre">
-          Milena Díaz
-          <img
-            src="@/assets/images/mariposa-.png"
-            class="mini-mariposa top"
-            alt="mariposa"
-          />
-        </h2>
-        <span class="ampersand">&amp;</span>
-        <h2 class="nombre-padre">
-          Mauricio Artunduaga
-          <img
-            src="@/assets/images/mariposa-.png"
-            class="mini-mariposa bottom"
-            alt="mariposa"
-          />
-        </h2>
-      </div>
+  <!-- FALTAN -->
+  <section class="seccion faltan panel">
+    <div v-revelar>
+      <h2 class="titulo-seccion">Faltan</h2>
+      <CountdownTimer :event-date="eventDate" />
     </div>
-
-    <!-- TÍTULO EVENTO -->
-    <div class="evento-box fade-in-element delay-1">
-      <p class="subtitulo-festejar">A FESTEJAR MIS</p>
-      <h1 class="xv-title">XV</h1>
-      <img
-        src="@/assets/images/mariposa-.png"
-        class="mariposa-centrada float-anim"
-        alt="mariposa dorada"
+    <svg class="corazon" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+        fill="currentColor"
       />
-    </div>
-
-    <!-- COUNTDOWN EVENTO -->
-    <div class="evento-box fade-in-element delay-2">
-      <p class="subtitulo-festejar2">FALTAN</p>
-      <CountdownTimer event-date="2027-04-23T18:00:00-05:00"/>
-    </div>
-
-    <!-- FECHA PRINCIPAL CON BRILLO -->
-    <div class="fecha-principal fade-in-element delay-3">
-      <h2 class="mes-title">Abril</h2>
-      <div class="fecha-filadecorada">
-        <span class="dia-texto">VIERNES</span>
-        <span class="numero-dia pulse-glow">23</span>
-        <span class="anio-texto">2027</span>
-      </div>
-      <h2 class="hora-title">7:00 p. m.</h2>
-    </div>
-
-    <!-- CALENDARIO CON NAVEEN -->
-    <div class="calendario-wrapper fade-in-element delay-4">
-      <div class="card-calendario">
-        <div class="grid-dias header">
-          <span>LUN</span><span>MAR</span><span>MIE</span><span>JUE</span>
-          <span>VIE</span><span>SAB</span><span>DOM</span>
-        </div>
-
-        <div class="grid-dias numeros">
-          <span class="empty"></span>
-          <span></span><span></span><span>1</span><span>2</span><span>3</span>
-          <span>4</span><span>5</span><span>6</span><span>7</span>
-          <span>8</span><span>9</span><span>10</span><span>11</span>
-          <span>12</span><span>13</span><span>14</span><span>15</span>
-          <span>16</span><span>17</span><span>18</span><span>19</span>
-          <span>20</span><span>21</span><span>22</span>
-
-          <span class="dia-destacado">
-            23
-            <svg
-              class="corazon-svg heartbeat"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#235848"
-              stroke-width="2"
-            >
-              <path
-                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-              />
-            </svg>
-          </span>
-          <span>24</span><span>25</span><span>26</span>
-          <span>27</span>
-          <span>28</span><span>29</span><span>30</span>
-        </div>
-      </div>
-
-      <img src="@/assets/images/sapo.png" alt="Sapo Naveen" class="rana-img" />
-    </div>
+    </svg>
   </section>
+
+  <GuirnaldaFlores tipo="divisor" />
+
+  <!-- CELEBRACIÓN: tarjeta flotante sobre el video de fondo -->
+  <section class="celebracion">
+
+    <div v-revelar class="tarjeta tarjeta-evento">
+      <!-- Ilustración: dos anillos dorados entrelazados -->
+      <svg class="anillos" viewBox="0 0 120 80" aria-hidden="true">
+        <defs>
+          <linearGradient id="oro-anillo" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f1dfae" />
+            <stop offset="0.45" stop-color="#c9a45c" />
+            <stop offset="1" stop-color="#8a6a2f" />
+          </linearGradient>
+        </defs>
+        <ellipse cx="46" cy="46" rx="24" ry="22" fill="none" stroke="url(#oro-anillo)" stroke-width="6" />
+        <ellipse cx="74" cy="46" rx="24" ry="22" fill="none" stroke="url(#oro-anillo)" stroke-width="6" />
+        <!-- el primer anillo vuelve a pasar por delante para que se vean entrelazados -->
+        <path d="M64.4 31.9A24 22 0 0 1 70 46" fill="none" stroke="url(#oro-anillo)" stroke-width="6" />
+        <path d="M80 13l5-7 5 7-5 6z" fill="#fdfbf7" stroke="#c9a45c" stroke-width="1.5" stroke-linejoin="round" />
+        <path d="M85 19v5" stroke="#c9a45c" stroke-width="2" />
+      </svg>
+
+      <h2 class="titulo-mayus">CELEBRACIÓN</h2>
+      <span class="filete" aria-hidden="true"></span>
+      <p class="mes">Diciembre</p>
+
+      <div class="fila-fecha">
+        <span class="lado">MARTES</span>
+        <span class="dia">22</span>
+        <span class="lado">6:00 PM</span>
+      </div>
+      <p class="anio">2026</p>
+
+      <p class="lugar">Finca La Anaconda</p>
+
+      <a :href="ubicacionUrl" target="_blank" rel="noopener noreferrer" class="btn-verde">
+        ¿Cómo llegar?
+      </a>
+    </div>
+
+  </section>
+
+  <GuirnaldaFlores tipo="divisor" />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
 import CountdownTimer from "@/components/CountdownTimer.vue";
+import GuirnaldaFlores from "@/components/GuirnaldaFlores.vue";
 
 defineProps<{
   eventDate: string;
 }>();
 
-const seccionRef = ref<HTMLElement | null>(null);
-let observer: IntersectionObserver | null = null;
-
-onMounted(() => {
-  if (!seccionRef.value) return;
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          // Agrega la clase activa al detectar la sección en el viewport
-          seccionRef.value?.classList.add("is-visible");
-          if (observer) observer.disconnect(); // Desconecta para que no repita la animación
-        }
-      });
-    },
-    { threshold: 0.15 }, // Se activa cuando el 15% de la sección es visible
-  );
-
-  observer.observe(seccionRef.value);
-});
-
-onBeforeUnmount(() => {
-  if (observer) observer.disconnect();
-});
+const ubicacionUrl =
+  "https://www.google.com/maps/place/FINCA+FUNDO+ANACONDA/@4.1217619,-73.453327,17z/data=!3m1!4b1!4m6!3m5!1s0x8e158700450d9e83:0xa1784734da66fe5f!8m2!3d4.1217619!4d-73.453327!16s%2Fg%2F11vj_cd68h!18m1!1e1?entry=ttu&g_ep=EgoyMDI2MDkwMi4wIKXMDSoASAFQAw%3D%3D";
 </script>
 
 <style scoped>
-/* ESTRUCTURA GENERAL */
-.invitacion-seccion {
+.faltan {
+  padding-top: 20px;
+  padding-bottom: 100px;
+}
+
+.corazon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 16px auto 0;
+  color: var(--oro);
+  animation: latir 2.2s ease-in-out infinite;
+}
+
+@keyframes latir {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.18);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.12);
+  }
+}
+
+/* Transparente: la tarjeta flota sobre el video de fondo */
+.celebracion {
   position: relative;
-  width: 100%;
-  max-width: none;
-  margin: 0 auto;
-  padding: 50px 15px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #235848;
-  text-align: center;
-  background-image: url("@/assets/images/fondo.jpg");
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
   overflow: hidden;
 }
 
-/* TEXTOS Y TIPOGRAFÍAS */
-.subtitulo,
-.subtitulo-festejar {
-  font-family: "Cormorant", serif;
-  font-size: 20px;
-  letter-spacing: 1.2px;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #235848;
+.tarjeta-evento {
+  z-index: 2;
+  /* angosta y centrada: a los lados se ve el video de fondo */
+  width: min(calc(100% - 48px), 300px);
+  margin: 110px auto;
+  padding-top: 22px;
 }
 
-.subtitulo-festejar2 {
-  font-family: "Cormorant", serif;
-  font-size: 20px;
-  letter-spacing: 0.2px;
-  margin-top: 20px;
-  margin-bottom: -20px;
-  font-weight: 600;
-  color: #235848;
-}
-
-/* SECCIÓN PADRES */
-.padres-box {
-  position: relative;
-  margin: 30px 0 30px 0;
-  padding-inline: 26px;
-  box-sizing: border-box;
-}
-
-.nombre-padre {
-  font-family: "Great Vibes", cursive;
-  font-size: clamp(1.7rem, 8vw, 2.5rem);
-  font-weight: 400;
-  margin: 0;
-  position: relative;
-  display: inline-block;
-  color: #a39236;
-  transition: transform 0.3s ease;
-  max-width: 100%;
-}
-
-.nombre-padre:hover {
-  transform: scale(1.05);
-}
-
-.ampersand {
+.anillos {
   display: block;
-  font-family: "Great Vibes", cursive;
-  font-size: clamp(1.7rem, 8vw, 2.5rem);
-  margin: -6px 0;
-  color: #a39236;
-}
-
-.mini-mariposa {
-  position: absolute;
-  width: 20px;
+  width: 110px;
   height: auto;
-  animation: flutter 3s ease-in-out infinite alternate;
-}
-.mini-mariposa.top {
-  top: 0;
-  right: -16px;
-}
-.mini-mariposa.bottom {
-  top: -4px;
-  left: -16px;
-  animation-delay: 1.5s;
+  margin: 0 auto 6px;
 }
 
-/* TÍTULO XV */
-.xv-title {
-  font-family: "Cormorant", serif;
-  font-size: 54px;
-  font-weight: 400;
-  margin: 0;
-  line-height: 1;
-  color: #4a8e5c;
-  transition: transform 0.3s ease;
+.filete {
+  display: block;
+  width: 70%;
+  height: 1px;
+  margin: 8px auto 10px;
+  background: var(--linea);
 }
 
-.xv-title:hover {
-  transform: scale(1.08);
-}
-
-.mariposa-centrada {
-  width: 48px;
-  margin: 8px 0;
-}
-
-/* FECHA PRINCIPAL */
-.fecha-principal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 380px;
-  margin: 20px auto;
-  text-align: center;
-}
-
-.mes-title {
-  font-family: "Great Vibes", "Playfair Display", cursive;
-  font-size: 3.2rem;
-  color: #235848;
-  font-weight: 400;
-  margin: 0 0 10px 0;
-  line-height: 1;
-}
-.hora-title {
-  font-family: "Cormorant", serif;
-  font-size: 3.2rem;
-  color: #235848;
-  font-weight: 400;
-  margin: 20px 0 10px 0;
-  line-height: 1;
-}
-
-.fecha-filadecorada {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  gap: 15px;
-}
-
-.dia-texto,
-.anio-texto {
-  position: relative;
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 0;
-  font-family: "Cinzel", "Cormorant Garamond", serif;
-  font-size: 1.1rem;
-  color: #1a1a1a;
+.mes {
+  margin: 0 0 6px;
+  font-family: var(--fuente-mayus);
+  font-size: 0.85rem;
   letter-spacing: 2px;
-  font-weight: 500;
+  color: var(--oro);
 }
 
-.dia-texto::before,
-.dia-texto::after,
-.anio-texto::before,
-.anio-texto::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1.5px;
-  background-color: #d4a359;
-}
-
-.dia-texto::before,
-.anio-texto::before {
-  top: 0;
-}
-
-.dia-texto::after,
-.anio-texto::after {
-  bottom: 0;
-}
-
-.numero-dia {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 3.2rem;
-  font-weight: 600;
-  font-style: italic;
-  color: #2e6b58;
-  padding: 0 10px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-/* CALENDARIO */
-.calendario-wrapper {
-  position: relative;
-  width: 100%;
-  margin-top: 40px;
-}
-
-.card-calendario {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(4px);
-  border-radius: 12px;
-  padding: 18px 12px 35px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.card-calendario:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-.grid-dias {
+.fila-fecha {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px 2px;
-  font-family: "Cinzel", serif;
-}
-
-.grid-dias.header {
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.grid-dias.numeros {
-  font-size: 1rem;
-}
-
-.grid-dias.numeros span:not(.empty) {
-  transition:
-    transform 0.2s ease,
-    color 0.2s ease;
-}
-
-.grid-dias.numeros span:not(.empty):hover {
-  transform: scale(1.2);
-  color: #a39236;
-}
-
-.dia-destacado {
-  position: relative;
-  font-weight: 700;
-  display: flex;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
 }
 
-.corazon-svg {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.lado {
+  padding: 5px 0;
+  border-block: 1px solid var(--oro-claro);
+  font-family: var(--fuente-mayus);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--titulo);
 }
 
-.rana-img {
-  position: absolute;
-  bottom: -22px;
-  /* Bajo las columnas SAB/DOM vacías para no tapar los días 29 y 30 */
-  right: 4px;
-  width: 90px;
-  height: auto;
-  z-index: 5;
-  pointer-events: none;
+.dia {
+  font-family: var(--fuente-titulo);
+  font-size: 3.4rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--verde-oscuro);
 }
 
-/* =========================================
-   ESTADOS DE ANIMACIÓN ON-SCROLL
-========================================= */
-
-/* Estado inicial (oculto antes del scroll) */
-.fade-in-element {
-  opacity: 0;
-  transform: translateY(30px);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+.anio {
+  margin: 2px 0 14px;
+  font-family: var(--fuente-mayus);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--titulo);
 }
 
-/* Estado activo (cuando el scroll llega a la sección) */
-.invitacion-seccion.is-visible .fade-in-element {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Delays escalonados para la entrada secuencial */
-.invitacion-seccion.is-visible .delay-1 {
-  transition-delay: 0.15s;
-}
-.invitacion-seccion.is-visible .delay-2 {
-  transition-delay: 0.3s;
-}
-.invitacion-seccion.is-visible .delay-3 {
-  transition-delay: 0.45s;
-}
-.invitacion-seccion.is-visible .delay-4 {
-  transition-delay: 0.6s;
-}
-
-/* ANIMACIONES CONTINUAS (Mariposa, Sapo, Corazón) */
-.float-anim {
-  animation: float 3.5s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(3deg);
-  }
-}
-
-@keyframes flutter {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-  100% {
-    transform: translateY(-4px) scale(1.1) rotate(-5deg);
-  }
-}
-
-@keyframes floatRana {
-  0%,
-  100% {
-    transform: translateX(-50%) translateY(0);
-  }
-  50% {
-    transform: translateX(-50%) translateY(-5px);
-  }
-}
-
-.heartbeat {
-  animation: heartPulse 2s ease-in-out infinite;
-}
-
-@keyframes heartPulse {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  14% {
-    transform: translate(-50%, -50%) scale(1.15);
-  }
-  28% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  42% {
-    transform: translate(-50%, -50%) scale(1.12);
-  }
-  70% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-.pulse-glow {
-  animation: glow 3s ease-in-out infinite alternate;
-}
-
-@keyframes glow {
-  0% {
-    text-shadow: 0 0 0px rgba(46, 107, 88, 0);
-  }
-  100% {
-    text-shadow: 0 0 10px rgba(46, 107, 88, 0.3);
-  }
-}
-
-/* ADAPTACIÓN MÓVIL */
-/* En móvil ocupa todo el ancho; desde tablet se muestra como tarjeta */
-@media (min-width: 600px) {
-  .invitacion-seccion {
-    max-width: 390px;
-  }
-}
-
-@media (max-width: 480px) {
-  .mes-title {
-    font-size: 2.8rem;
-  }
-  .hora-title {
-    font-size: 2rem;
-  }
-  .dia-texto,
-  .anio-texto {
-    font-size: 0.95rem;
-    letter-spacing: 1.5px;
-  }
-
-  .numero-dia {
-    font-size: 2.8rem;
-    padding: 0 6px;
-  }
-
-  .fecha-filadecorada {
-    gap: 10px;
-  }
+.lugar {
+  margin: 0;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--tinta);
 }
 </style>
