@@ -25,8 +25,6 @@ declare module 'vue' {
     InvitationIntro: typeof import('./src/components/InvitationIntro.vue')['default']
     InvitationMemories: typeof import('./src/components/InvitationMemories.vue')['default']
     InvitationMusica: typeof import('./src/components/InvitationMusica.vue')['default']
-    MainHeader: typeof import('./src/components/MainHeader.vue')['default']
-    PhotosUp: typeof import('./src/components/PhotosUp.vue')['default']
     PhotoUpload: typeof import('./src/components/PhotoUpload.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

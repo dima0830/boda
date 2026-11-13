@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import videoUrl from "@/assets/videos/video-fondo.mp4";
-import posterUrl from "@/assets/images/principal.jpg";
+import posterUrl from "@/assets/images/video-fondo-poster.webp";
 
 /*
   Tramo del video que se repite, en segundos.
