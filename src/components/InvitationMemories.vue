@@ -28,37 +28,21 @@
 
 <script setup lang="ts">
 import GalleryCarousel from "@/components/GalleryCarousel.vue";
-import galleryOne from "@/assets/images/gal1.jpg";
-import galleryTwo from "@/assets/images/gal2.jpg";
-import galleryThree from "@/assets/images/gal3.jpg";
-import galleryFour from "@/assets/images/gal4.jpg";
-import galleryFive from "@/assets/images/gal5.jpg";
-import gallerySix from "@/assets/images/gal6.jpg";
-import gallerySeven from "@/assets/images/gal7.jpg";
-import galleryEight from "@/assets/images/gal8.jpg";
-import galleryNine from "@/assets/images/gal9.jpg";
-import galleryTen from "@/assets/images/gal10.jpg";
-import galleryEleven from "@/assets/images/gal11.jpg";
-import galleryTwelve from "@/assets/images/gal12.jpg";
-import galleryThirteen from "@/assets/images/gal13.jpg";
-import galleryFourteen from "@/assets/images/gal14.jpg";
+/*
+  Fotos de la galería: cualquier src/assets/images/galN.webp (gal1, gal2, …),
+  en orden por número. Para agregar una foto basta con dejar el archivo ahí.
+*/
+const archivos = import.meta.glob<string>("../assets/images/gal*.webp", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+const numero = (ruta: string) => Number(ruta.match(/gal(\d+)/)?.[1] ?? 0);
 
-const galleryImages = [
-  galleryOne,
-  galleryTwo,
-  galleryThree,
-  galleryFour,
-  galleryFive,
-  gallerySix,
-  gallerySeven,
-  galleryEight,
-  galleryNine,
-  galleryTen,
-  galleryEleven,
-  galleryTwelve,
-  galleryThirteen,
-  galleryFourteen,
-].map((src, i) => ({ src, alt: `Recuerdo ${i + 1} de Andrea y Juan Carlos` }));
+const galleryImages = Object.keys(archivos)
+  .sort((a, b) => numero(a) - numero(b))
+  .map((ruta) => archivos[ruta])
+  .map((src, i) => ({ src, alt: `Recuerdo ${i + 1} de Andrea y Juan Carlos` }));
 </script>
 
 <style scoped>

@@ -257,11 +257,13 @@ const petalos = Array.from({ length: 14 }, (_, id) => ({
 
 @keyframes escribir {
   from {
-    clip-path: inset(0 100% 0 0);
+    /* márgenes negativos: los trazos de la cursiva que sobresalen arriba,
+       abajo y a los lados nunca se recortan */
+    clip-path: inset(-60% 100% -60% -20%);
     filter: blur(3px);
   }
   to {
-    clip-path: inset(0 0 0 0);
+    clip-path: inset(-60% -20% -60% -20%);
     filter: blur(0);
   }
 }

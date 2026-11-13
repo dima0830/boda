@@ -33,5 +33,6 @@ declare module 'vue' {
     TarjetaDetalle: typeof import('./src/components/TarjetaDetalle.vue')['default']
     VentanaModal: typeof import('./src/components/VentanaModal.vue')['default']
     VideoFondo: typeof import('./src/components/VideoFondo.vue')['default']
+    VideoGiratorio: typeof import('./src/components/VideoGiratorio.vue')['default']
   }
 }

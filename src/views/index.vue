@@ -27,6 +27,10 @@
       <GuirnaldaFlores tipo="divisor" />
       <!-- Compartimos este día junto a ti -->
       <PhotoUpload />
+      <!-- Claro entre secciones: se ve el video de fondo -->
+      <GuirnaldaFlores tipo="divisor" />
+      <div class="claro-video" aria-hidden="true"></div>
+      <GuirnaldaFlores tipo="divisor" />
       <!-- Confirmación -->
       <InvitationForm />
       <GuirnaldaFlores tipo="divisor" />
@@ -47,6 +51,12 @@ const eventDate = "2026-12-22T18:00:00-05:00";
 .contenido-invitacion {
   position: relative;
   z-index: 1;
+}
+
+.claro-video {
+  height: 45vh;
+  height: 45svh;
+  min-height: 260px;
 }
 
 .tarjetas {

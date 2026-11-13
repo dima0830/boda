@@ -3,8 +3,12 @@
   <section v-revelar class="detalle">
     <div class="tarjeta">
       <h2 class="titulo-seccion">{{ titulo }}</h2>
-      <div class="icono-linea">
+      <div class="icono-linea" :class="{ compacto: $slots.destacado }">
         <slot name="icono" />
+      </div>
+      <!-- Contenido destacado opcional (p. ej. un video), debajo del ícono -->
+      <div v-if="$slots.destacado" class="destacado">
+        <slot name="destacado" />
       </div>
       <p class="texto-seccion">{{ resumen }}</p>
       <button type="button" class="btn-verde" @click="abierta = true">
@@ -78,6 +82,18 @@ const abierta = ref(false);
 
 .tarjeta .btn-verde {
   margin-top: 30px;
+}
+
+.destacado {
+  width: 100%;
+  margin: 0 0 18px;
+}
+
+/* con contenido destacado, el ícono va más pequeño y pegado al título */
+.tarjeta .icono-linea.compacto {
+  width: 44px;
+  height: 44px;
+  margin: 16px auto 18px;
 }
 
 .icono-linea :slotted(svg) {

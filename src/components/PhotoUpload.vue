@@ -1,7 +1,7 @@
 <template>
   <section class="fotos-section panel">
     <div v-revelar class="seccion">
-      <h2 class="titulo-seccion">Compartimos este día junto a ti</h2>
+      <h2 class="titulo-seccion">Momentos</h2>
       <p class="texto-seccion">Comparte tus fotos y videos de este hermoso día</p>
 
       <!-- Ícono de línea: fotos -->
@@ -120,7 +120,7 @@ async function enviarFotos() {
 
 .fotos-section .seccion {
   padding-top: 100px;
-  padding-bottom: 20px;
+  padding-bottom: 100px;
 }
 
 .input-oculto {

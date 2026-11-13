@@ -1,5 +1,10 @@
 <template>
   <TarjetaDetalle titulo="Dress Code" resumen="Una orientación para tu vestuario">
+    <!-- La pareja girando 360° (src/assets/videos/Couple_rotating.mp4) -->
+    <template v-if="videoDressCode" #destacado>
+      <VideoGiratorio :src="videoDressCode" descripcion="Pareja con traje formal y vestido de gala girando" />
+    </template>
+
     <template #icono>
       <!-- Ícono de línea: corbatín -->
       <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -10,6 +15,12 @@
       </svg>
     </template>
 
+    <VideoGiratorio
+      v-if="videoDressCode"
+      class="video-ventana"
+      :src="videoDressCode"
+      descripcion="Pareja con traje formal y vestido de gala girando"
+    />
     <p class="subtitulo">Formal / Etiqueta</p>
     <p class="texto-seccion">
       Te invitamos a vestir con elegancia para este día tan especial.
@@ -23,9 +34,26 @@
 
 <script setup lang="ts">
 import TarjetaDetalle from "@/components/TarjetaDetalle.vue";
+import VideoGiratorio from "@/components/VideoGiratorio.vue";
+
+/*
+  Busca el video sin romper la página si no existe (se acepta
+  src/assets/videos/Couple_rotating.mp4 o dresscode.mp4); si no hay, queda el ícono.
+*/
+const encontrados = import.meta.glob<string>("../assets/videos/{Couple_rotating,dresscode}.{mp4,webm,mov}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+const videoDressCode = Object.values(encontrados)[0] ?? null;
 </script>
 
 <style scoped>
+.video-ventana {
+  max-width: 190px;
+  margin-bottom: 16px;
+}
+
 .subtitulo {
   margin: -4px 0 10px;
   font-family: var(--fuente-mayus);

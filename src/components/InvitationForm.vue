@@ -158,7 +158,7 @@ async function confirmAttendance() {
 
 <style scoped>
 .confirmacion {
-  padding-top: 30px;
+  padding-top: 100px;
   padding-bottom: 100px;
 }
 
