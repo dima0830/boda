@@ -39,7 +39,7 @@
     </div>
 
     <!-- COUNTDOWN EVENTO -->
-    <div class="evento-box fade-in-element delay-2 border border-gray-400">
+    <div class="evento-box fade-in-element delay-2">
       <p class="subtitulo-festejar2">FALTAN</p>
       <CountdownTimer event-date="2027-04-23T18:00:00-05:00"/>
     </div>
