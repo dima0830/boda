@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import { enviarFormulario } from "@/envio";
 import { ref } from "vue";
 import TarjetaDetalle from "@/components/TarjetaDetalle.vue";
 
@@ -58,17 +59,12 @@ async function enviar() {
   error.value = "";
   enviando.value = true;
   try {
-    // Mismo servidor que la confirmación de asistencia (/api/rsvp)
-    const respuesta = await fetch("/api/canciones", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: nombre.value.trim(),
-        song: cancion.value.trim(),
-        link: enlace.value.trim(),
-      }),
+    // Mismo destino que la confirmación de asistencia (ver src/envio.ts)
+    await enviarFormulario("/api/canciones", {
+      fullName: nombre.value.trim(),
+      song: cancion.value.trim(),
+      link: enlace.value.trim(),
     });
-    if (!respuesta.ok) throw new Error("No se pudo guardar la canción.");
     enviadaCancion.value = cancion.value.trim();
     enviada.value = true;
   } catch {

@@ -88,6 +88,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import VentanaModal from "@/components/VentanaModal.vue";
+import { enviarFormulario } from "@/envio";
 
 // Los valores se guardan igual que antes en /api/rsvp
 const SI_ASISTE = "Acepto con mucho gusto";
@@ -131,18 +132,13 @@ async function confirmAttendance() {
   const pases = isAttending.value ? (passesCount.value ?? 0) : 0;
 
   try {
-    const response = await fetch("/api/rsvp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fullName: guestName.value.trim(),
-        phone: guestPhone.value.trim(),
-        attendance: attendance.value,
-        passesCount: pases,
-        message: guestMessage.value.trim(),
-      }),
+    await enviarFormulario("/api/rsvp", {
+      fullName: guestName.value.trim(),
+      phone: guestPhone.value.trim(),
+      attendance: attendance.value,
+      passesCount: pases,
+      message: guestMessage.value.trim(),
     });
-    if (!response.ok) throw new Error("No se pudo guardar la confirmación.");
     submittedName.value = guestName.value.trim();
     submittedPasses.value = pases;
     submitted.value = true;
