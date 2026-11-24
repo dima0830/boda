@@ -17,16 +17,20 @@
 
         <button v-if="!abierta" type="button" class="toque" aria-label="Abrir las puertas" @click="abrir"></button>
 
-        <div class="letrero" aria-hidden="true">
-          <small>{{ invitado.nombre ? "Te esperamos" : "Bienvenidos" }}</small>
-          <p class="nombre">{{ invitado.nombre || NOVIOS }}</p>
-          <p v-if="invitado.pases" class="pases">{{ textoPases }}</p>
+        <div class="letrero" :class="{ general: !invitado.nombre }" aria-hidden="true">
+          <template v-if="invitado.nombre">
+            <small>Te esperamos</small>
+            <p class="nombre">{{ invitado.nombre }}</p>
+            <p v-if="invitado.pases" class="pases">{{ textoPases }}</p>
+          </template>
+          <!-- sin nombre en el enlace: solo un saludo -->
+          <p v-else class="nombre">Bienvenidos</p>
         </div>
 
         <p class="pista" aria-hidden="true">Toca para entrar</p>
 
         <div class="bienvenida">
-          <p class="antes">Bienvenidos a nuestra boda</p>
+          <p class="antes">{{ invitado.nombre ? "Bienvenidos a nuestra boda" : "Bienvenidos a la boda de" }}</p>
           <p class="nombre">{{ invitado.nombre || NOVIOS }}</p>
           <p v-if="invitado.pases" class="pases">{{ textoPases }}</p>
           <div class="acciones">
@@ -136,26 +140,31 @@ async function dibujarRecuerdo(): Promise<HTMLCanvasElement> {
   c.fillStyle = velo;
   c.fillRect(0, H * 0.42, A, H * 0.58);
 
+  // sin nombre del invitado el bloque de texto es más corto: se baja para centrarlo
+  const baja = invitado.nombre ? 0 : 230;
   c.textAlign = "center";
   c.fillStyle = "#8a6d3b";
   c.font = '500 34px "Cinzel"';
-  espaciado(c, "BIENVENIDOS A NUESTRA BODA", A / 2, 1290, 6);
+  espaciado(c, "BIENVENIDOS A NUESTRA BODA", A / 2, 1290 + baja, 6);
 
   c.fillStyle = "#4d4b43";
   c.font = '96px "Great Vibes"';
-  c.fillText(NOVIOS, A / 2, 1400);
+  c.fillText(NOVIOS, A / 2, 1400 + baja);
 
-  c.fillStyle = "#6b5a3a";
-  c.font = 'italic 46px "Cormorant Garamond"';
-  c.fillText(invitado.nombre ? "invitación para" : "te esperamos", A / 2, 1490);
+  // el nombre del invitado solo va si el enlace lo trae
+  if (invitado.nombre) {
+    c.fillStyle = "#6b5a3a";
+    c.font = 'italic 46px "Cormorant Garamond"';
+    c.fillText("invitación para", A / 2, 1490);
 
-  const oro = c.createLinearGradient(A * 0.2, 0, A * 0.8, 0);
-  oro.addColorStop(0, "#a97b30");
-  oro.addColorStop(0.45, "#d9b46a");
-  oro.addColorStop(1, "#a97b30");
-  c.fillStyle = oro;
-  c.font = `${ajustarTamano(c, invitado.nombre || "con mucho cariño", 132, A - 140)}px "Great Vibes"`;
-  c.fillText(invitado.nombre || "con mucho cariño", A / 2, 1630);
+    const oro = c.createLinearGradient(A * 0.2, 0, A * 0.8, 0);
+    oro.addColorStop(0, "#a97b30");
+    oro.addColorStop(0.45, "#d9b46a");
+    oro.addColorStop(1, "#a97b30");
+    c.fillStyle = oro;
+    c.font = `${ajustarTamano(c, invitado.nombre, 132, A - 140)}px "Great Vibes"`;
+    c.fillText(invitado.nombre, A / 2, 1630);
+  }
 
   if (invitado.pases) {
     c.fillStyle = "#8a6d3b";
@@ -165,7 +174,7 @@ async function dibujarRecuerdo(): Promise<HTMLCanvasElement> {
 
   c.fillStyle = "#4d4b43";
   c.font = '500 40px "Cormorant Garamond"';
-  c.fillText(FECHA, A / 2, 1810);
+  c.fillText(FECHA, A / 2, invitado.nombre ? 1810 : 1500 + baja);
   return lienzo;
 }
 
@@ -310,6 +319,15 @@ function ajustarTamano(c: CanvasRenderingContext2D, texto: string, tamano: numbe
   margin: 4% 0 2%;
   font: 10.5cqw/1.05 var(--fuente-cursiva);
   color: var(--titulo);
+}
+
+.letrero.general {
+  padding: 9% 6% 8%;
+}
+
+.letrero.general .nombre {
+  margin: 0;
+  font-size: 13cqw;
 }
 
 .letrero .pases {
