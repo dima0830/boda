@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { enviarArchivos } from "@/envio";
 
 interface PreviewFile {
   file: File;
@@ -96,8 +97,8 @@ async function enviarFotos() {
       formData.append(`fotos[${index}]`, item.file);
     });
 
-    // Simulación del envío al servidor (aún no hay backend para las fotos)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Modo muestra, hoja de Google (Drive) o servidor propio: ver src/envio.ts
+    await enviarArchivos("/api/fotos", formData);
 
     statusType.value = "success";
     statusMessage.value = "¡Gracias por compartir tus recuerdos!";
