@@ -13,6 +13,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     CountdownTimer: typeof import('./src/components/CountdownTimer.vue')['default']
     DressCodeSection: typeof import('./src/components/DressCodeSection.vue')['default']
+    EntradaPuertas: typeof import('./src/components/EntradaPuertas.vue')['default']
     GalleryCarousel: typeof import('./src/components/GalleryCarousel.vue')['default']
     GuirnaldaFlores: typeof import('./src/components/GuirnaldaFlores.vue')['default']
     InvitationAudio: typeof import('./src/components/InvitationAudio.vue')['default']

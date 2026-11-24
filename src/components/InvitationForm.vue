@@ -54,10 +54,12 @@
         </label>
 
         <fieldset v-if="isAttending" class="campo">
-          <legend class="campo-etiqueta">Según tu pase asignado, ¿cuántos pases usarás?</legend>
+          <legend class="campo-etiqueta">
+            {{ invitado.pases ? `Tienes ${invitado.pases} ${invitado.pases === 1 ? "pase" : "pases"}. ¿Cuántos usarás?` : "Según tu pase asignado, ¿cuántos pases usarás?" }}
+          </legend>
           <div class="pases">
             <button
-              v-for="num in [1, 2, 3]"
+              v-for="num in opcionesPases"
               :key="num"
               type="button"
               class="pase"
@@ -89,6 +91,7 @@
 import { ref, computed } from "vue";
 import VentanaModal from "@/components/VentanaModal.vue";
 import { enviarFormulario } from "@/envio";
+import { invitado } from "@/invitado";
 
 // Los valores se guardan igual que antes en /api/rsvp
 const SI_ASISTE = "Acepto con mucho gusto";
@@ -99,11 +102,15 @@ const opcionesAsistencia = [
 ];
 
 const abierta = ref(false);
-const guestName = ref("");
+/* Con enlace personalizado: el nombre viene escrito y solo se pueden elegir los pases asignados */
+const guestName = ref(invitado.nombre);
 const guestPhone = ref("");
 const guestMessage = ref("");
 const attendance = ref("");
-const passesCount = ref<number | null>(null);
+const opcionesPases = invitado.pases
+  ? Array.from({ length: invitado.pases }, (_, i) => i + 1)
+  : [1, 2, 3];
+const passesCount = ref<number | null>(invitado.pases === 1 ? 1 : null);
 const confirmationError = ref("");
 
 const isSubmitting = ref(false);
@@ -138,6 +145,8 @@ async function confirmAttendance() {
       attendance: attendance.value,
       passesCount: pases,
       message: guestMessage.value.trim(),
+      // de qué enlace llegó la confirmación (columna "Invitación para" en la hoja)
+      ...(invitado.nombre ? { invitacion: invitado.nombre, pasesAsignados: invitado.pases || "" } : {}),
     });
     submittedName.value = guestName.value.trim();
     submittedPasses.value = pases;
@@ -194,6 +203,7 @@ async function confirmAttendance() {
 
 .pases {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 6px;
 }

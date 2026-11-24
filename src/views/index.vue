@@ -40,6 +40,9 @@
 
     <!-- Botón flotante de música -->
     <InvitationAudio />
+
+    <!-- Entrada personalizada: portón con el nombre del invitado -->
+    <EntradaPuertas />
   </main>
 </template>
 

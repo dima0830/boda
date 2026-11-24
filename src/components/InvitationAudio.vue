@@ -19,11 +19,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import cancionUrl from "@/assets/audio/Joan-Sebastian-Disename.mp3";
 
 const audioRef = ref<HTMLAudioElement | null>(null);
 const sonando = ref(false);
+
+/* La entrada (EntradaPuertas) pide la música al abrir las puertas */
+function alPedirMusica() {
+  if (audioRef.value?.paused) alternar();
+}
+onMounted(() => window.addEventListener("invitacion:musica", alPedirMusica));
+onBeforeUnmount(() => window.removeEventListener("invitacion:musica", alPedirMusica));
 
 async function alternar() {
   const audio = audioRef.value;
